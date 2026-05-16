@@ -1,0 +1,65 @@
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://192.168.1.4:3000',
+  withCredentials: true
+});
+
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+    console.log(`[Request] Sending to ${config.url} with token: ${token.substring(0, 10)}...`);
+  } else {
+    console.warn(`[Request] Sending to ${config.url} WITHOUT token`);
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  res => {
+    // LOG 2: Pantau respon sukses
+    console.log(`[Response Success] From ${res.config.url}`);
+    return res;
+  },
+  async err => {
+    const originalRequest = err.config;
+
+    console.error(`[Response Error] Status: ${err.response?.status} | URL: ${originalRequest.url}`);
+
+    const authEndpoints = [
+      '/auth/login',
+      '/auth/register',
+      '/auth/forgot-password',
+      '/auth/reset-password',
+      '/auth/refresh'
+    ];
+
+    if (
+      err.response?.status === 401 &&
+      !originalRequest._retry &&
+      !authEndpoints.some(path => originalRequest.url.includes(path))
+    ) {
+      originalRequest._retry = true;
+      console.log("%c[Auth] Access Token expired. Attempting refresh...", "color: orange; font-weight: bold;");
+
+      try {
+        const res = await api.post('/auth/refresh');
+        localStorage.setItem('accessToken', res.data.accessToken);
+        console.log("%c[Auth] Refresh Success! New Token obtained.", "color: green; font-weight: bold;");
+
+        originalRequest.headers.Authorization =
+          `Bearer ${res.data.accessToken}`;
+
+        return api(originalRequest);
+      } catch {
+        localStorage.removeItem('accessToken');
+        window.location.href = '/auth';
+      }
+    }
+
+    return Promise.reject(err);
+  }
+);
+
+export default api;
