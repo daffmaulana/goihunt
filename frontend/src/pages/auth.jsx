@@ -13,7 +13,7 @@ export default function Auth() {
 
         <div className="text-center mb-4">
           <img 
-            src="/public/goihuntlogo.svg" 
+            src="/goihuntlogo.svg" 
             alt="GoiHunt Logo"
             className="img-fluid"
             draggable="false"
