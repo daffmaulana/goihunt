@@ -1,5 +1,3 @@
-// // /resetpass
-
 import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
@@ -21,7 +19,6 @@ export default function resetPassword() {
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // ================= REQUEST RESET =================
   const handleRequestReset = async (e) => {
     e.preventDefault();
 
@@ -76,10 +73,9 @@ export default function resetPassword() {
     } finally {
     setLoading(false); 
     setErrors([]);
-  }
+    }
   };
 
-  // ================= RESET PASSWORD =================
   const handleResetPassword = async (e) => {
     e.preventDefault();
 
@@ -172,7 +168,6 @@ export default function resetPassword() {
           />
         </div>
 
-        {/* Tombol Back Baru */}
         {step !== 'reset' && (
           <div className="mb-3 pb-3 border-bottom border-2">
             <button
@@ -188,9 +183,8 @@ export default function resetPassword() {
         )}
 
         <h5 className="text-center fw-bold mb-3">Reset Password</h5>
-      
-
-        {/* ================= REQUEST ================= */}
+        
+        {/* PERMINTAAN RESET */}
         {step === 'request' && (
           <form onSubmit={handleRequestReset} noValidate>
             <input
@@ -220,7 +214,6 @@ export default function resetPassword() {
           </form>
         )}
 
-        {/* ================= SENT ================= */}
         {step === 'sent' && (
           <div className="text-center">
             <p className="mb-3">
@@ -236,7 +229,7 @@ export default function resetPassword() {
           </div>
         )}
 
-        {/* ================= RESET ================= */}
+       {/* TOKEN DIDAPAT DAN SUBMIT PASS BARU */}
         {step === 'reset' && (
           <form onSubmit={handleResetPassword}>
             
@@ -268,14 +261,13 @@ export default function resetPassword() {
               disabled={loading}
             />
 
-      {errors.length > 0 && (
-        <div className="mb-3 text-danger">
-          {errors.map((err, i) => (
-            <p className='mb-0' key={i}>{err}</p>
-          ))}
-        </div>
-      )}
-
+            {errors.length > 0 && (
+              <div className="mb-3 text-danger">
+                {errors.map((err, i) => (
+                  <p className='mb-0' key={i}>{err}</p>
+                ))}
+              </div>
+            )}
             <button
               type="submit"
               className="btn btn-primary w-100 btn-lg"
@@ -285,7 +277,6 @@ export default function resetPassword() {
             </button>
           </form>
         )}
-
       </div>
     </div>
   );

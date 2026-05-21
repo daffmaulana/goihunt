@@ -16,36 +16,26 @@ exports.getProfile = async (req, res) => {
     );
 
     const user=result.rows[0];
-    const currentLevelData =
-      Levels.find(l => l.level === user.level);
+    const currentLevelData = Levels.find(l => l.level === user.level);
 
     // Cari next level
-    const nextLevelData =
-      Levels.find(l => l.level === user.level + 1);
+    const nextLevelData = Levels.find(l => l.level === user.level + 1);
 
-    const currentRequiredXp =
-      currentLevelData?.requiredXp || 0;
+    const currentRequiredXp = currentLevelData?.requiredXp || 0;
 
-    const nextRequiredXp =
-      nextLevelData?.requiredXp || currentRequiredXp;
+    const nextRequiredXp = nextLevelData?.requiredXp || currentRequiredXp;
 
     // XP dalam level sekarang
-    const xpCurrent =
-      user.xp - currentRequiredXp;
+    const xpCurrent = user.xp - currentRequiredXp;
 
     // Total XP yang dibutuhkan untuk naik level
-    const xpNeeded =
-      nextRequiredXp - currentRequiredXp;
+    const xpNeeded = nextRequiredXp - currentRequiredXp;
 
     // Progress %
-    const progress =
-      xpNeeded > 0
-        ? (xpCurrent / xpNeeded) * 100
-        : 100;
+    const progress =  xpNeeded > 0 ? (xpCurrent / xpNeeded) * 100 : 100;
 
     res.json({
       ...user,
-
       xp_current: xpCurrent,
       xp_next: xpNeeded,
       progress: Math.min(progress, 100)
@@ -95,7 +85,7 @@ exports.updateProfile = async (req, res) => {
       [username, profileImage, userId]
     );
 
-    res.json({ code:'PROFILE_UPDATED', message: 'Profile Successfully Updated' });
+    res.json({ code:'PROFILE_UPDATED', message: 'Profil diperbarui' });
 
   } catch (err) {
     console.error(err);
@@ -136,12 +126,12 @@ exports.updatePassword = async (req, res) => {
     );
 
     if (!isMatch) {
-      return res.status(401).json({ code:'INVALID_OLD_PASSWORD', message: 'Password lama salah' });
+      return res.status(400).json({ code:'INVALID_OLD_PASSWORD', message: 'Password lama salah' });
     }
 
     const isSamePassword = await bcrypt.compare(
-    newPassword,
-    userQuery.rows[0].password
+      newPassword,
+      userQuery.rows[0].password
     );
 
     if (isSamePassword) {

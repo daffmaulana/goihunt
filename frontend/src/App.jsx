@@ -10,38 +10,41 @@ import Gamifikasi from './pages/gamifikasi';
 import Wrapper from './pages/wrapper';
 import Leaderboard from './pages/leaderboard';
 import Koleksi from './pages/koleksi';
+import { UserProvider } from './components/userContext';
 
 function App() {
   return (
-    <div className="bg-dark min-vh-100 d-flex justify-content-center">
-      <div className="app-container bg-white min-vh-100 shadow">
-        <Routes>
-          {/* ROOT */}
-          <Route path="/" element={<Navigate to="/klasifikasi" replace />} />
+    <UserProvider>
+      <div className="bg-dark min-vh-100 d-flex justify-content-center">
+        <div className="app-container bg-white min-vh-100 shadow">
+          <Routes>
+            {/* ROOT */}
+            <Route path="/" element={<Navigate to="/klasifikasi" replace />} />
 
-          {/* PUBLIC */}
-          <Route path="/auth" element={<AuthGate type="public"><Auth /></AuthGate>} />
+            {/* PUBLIC */}
+            <Route path="/auth" element={<AuthGate type="public"><Auth /></AuthGate>} />
 
-          <Route path="/reset" element={<AuthGate type="public"><ResetPassword /></AuthGate>} />
+            <Route path="/reset" element={<AuthGate type="public"><ResetPassword /></AuthGate>} />
 
-          {/* PRIVATE + LAYOUT */}
-          <Route element={<AuthGate type="private"><Wrapper /></AuthGate>}>
-            <Route path="/klasifikasi" element={<Klasifikasi />} />
-            <Route path="/gamifikasi" element={<Gamifikasi />} />
-          </Route>
-          
-          {/* PRIVATE */}
-          <Route path="/profile" element={<AuthGate type="private"><Profile /></AuthGate>} />
-          <Route path="/leaderboard" element={<AuthGate type="private"><Leaderboard /></AuthGate>} />
-          <Route path="/koleksi" element={<AuthGate type="private"><Koleksi /></AuthGate>} />
+            {/* PRIVATE + LAYOUT */}
+            <Route element={<AuthGate type="private"><Wrapper /></AuthGate>}>
+              <Route path="/klasifikasi" element={<Klasifikasi />} />
+              <Route path="/gamifikasi" element={<Gamifikasi />} />
+            </Route>
+            
+            {/* PRIVATE */}
+            <Route path="/profile" element={<AuthGate type="private"><Profile /></AuthGate>} />
+            <Route path="/leaderboard" element={<AuthGate type="private"><Leaderboard /></AuthGate>} />
+            <Route path="/koleksi" element={<AuthGate type="private"><Koleksi /></AuthGate>} />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
 
-        <ToastContainer position="top-center" autoClose={1500} closeOnClick draggable closeButton={false} transition={Flip} className="custom-toast-container"/>
+          <ToastContainer position="top-center" autoClose={1700} closeOnClick draggable closeButton={false} transition={Flip} className="custom-toast-container"/>
 
+        </div>
       </div>
-    </div>
+    </UserProvider>
   );
 }
 

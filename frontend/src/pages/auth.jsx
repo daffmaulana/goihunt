@@ -4,7 +4,7 @@ import { useState } from 'react';
 import LoginForm from '../components/loginForm';
 import RegisterForm from '../components/registerForm';
 
-function Auth() {
+export default function Auth() {
   const [mode, setMode] = useState('login');
 
   return (
@@ -46,5 +46,3 @@ function Auth() {
     </div>
   );
 }
-
-export default Auth;

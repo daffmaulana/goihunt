@@ -18,7 +18,6 @@ api.interceptors.request.use(config => {
 
 api.interceptors.response.use(
   res => {
-    // LOG 2: Pantau respon sukses
     console.log(`[Response Success] From ${res.config.url}`);
     return res;
   },
@@ -41,12 +40,12 @@ api.interceptors.response.use(
       !authEndpoints.some(path => originalRequest.url.includes(path))
     ) {
       originalRequest._retry = true;
-      console.log("%c[Auth] Access Token expired. Attempting refresh...", "color: orange; font-weight: bold;");
+      console.log("%c[Auth] Access Token expired. Attempting refresh...");
 
       try {
         const res = await api.post('/auth/refresh');
         localStorage.setItem('accessToken', res.data.accessToken);
-        console.log("%c[Auth] Refresh Success! New Token obtained.", "color: green; font-weight: bold;");
+        console.log("%c[Auth] Refresh Success! New Token obtained.");
 
         originalRequest.headers.Authorization =
           `Bearer ${res.data.accessToken}`;

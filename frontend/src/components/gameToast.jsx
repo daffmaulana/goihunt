@@ -3,6 +3,8 @@ import {
   CheckCircle2,
   XCircle,
   Info,
+  TrendingUp,
+  TrendingDown,
 } from 'lucide-react';
 
 const baseConfig = {
@@ -21,7 +23,7 @@ export const gameToast = {
         </div>
 
         <div className="toast-text-group">
-          <span className="toast-title">SUCCESS</span>
+          <span className="toast-title">BERHASIL</span>
           <span className="toast-message">{message}</span>
         </div>
       </div>,
@@ -31,7 +33,7 @@ export const gameToast = {
       }
     ),
 
-  error: (message) =>
+  error: (message, options) =>
     toast(
       <div className="game-toast-content error">
         <div className="toast-icon error-icon">
@@ -39,16 +41,17 @@ export const gameToast = {
         </div>
 
         <div className="toast-text-group">
-          <span className="toast-title">ERROR</span>
+          <span className="toast-title">GAGAL</span>
           <span className="toast-message">{message}</span>
         </div>
       </div>,
       {
         ...baseConfig,
+        ...options,
       }
     ),
 
-  info: (message) =>
+  info: (message, options) =>
     toast(
       <div className="game-toast-content info">
         <div className="toast-icon info-icon">
@@ -62,6 +65,28 @@ export const gameToast = {
       </div>,
       {
         ...baseConfig,
+        ...options,
       }
     ),
+
+  xp: (xpAmount, title, options) => {
+    const isGain = xpAmount >= 0;
+    const displayAmount = Math.abs(xpAmount);
+
+    return toast(
+      <div className={`game-toast-content xp ${isGain ? 'xp-gain' : 'xp-loss'}`}>
+        <div className={`toast-icon ${isGain ? 'xp-gain-icon' : 'xp-loss-icon'}`}>
+          {isGain ? <TrendingUp size={24} /> : <TrendingDown size={24} />}</div>
+
+        <div className="toast-text-group">
+          <span className="toast-title">{title}</span>
+          <span className="toast-message">{isGain ? '+' : '-'}{displayAmount} Poin</span>
+        </div>
+      </div>,
+      {
+        ...baseConfig, 
+        ...options,
+      }
+    );
+  },
 };

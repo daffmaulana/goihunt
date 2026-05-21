@@ -1,3 +1,6 @@
+// menambahkan XP ke table users sesuai activity (xpRules.js)
+// dipanggil dari klasifikasi.jsx
+
 const pool = require('../db');
 const xpRules = require('../config/xpRules');
 const LEVELS = require('../config/levelConfig');
@@ -32,7 +35,7 @@ const addXpToUser = async (userId, type, customAmount = null) => {
   const newLevel = upLevel(newXp);
 
   await pool.query(
-    'UPDATE users SET xp = $1, level = $2 WHERE id = $3',
+    'UPDATE users SET xp = $1, level = $2, xp_timestamp = NOW() WHERE id = $3',
     [newXp, newLevel, userId]
   );
 

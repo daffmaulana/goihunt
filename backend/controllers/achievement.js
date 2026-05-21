@@ -30,10 +30,6 @@ try {
       unlocked_at: a.unlocked_at // keep this for sorting
     }));
 
-    // Sorting Logic: 
-    // 1. Unlocked items first
-    // 2. Among unlocked items, sort by date (Newest first: DESC, Oldest first: ASC)
-    // 3. Locked items stay at the bottom
     result.sort((a, b) => {
       if (a.unlocked === b.unlocked) {
         if (a.unlocked) {

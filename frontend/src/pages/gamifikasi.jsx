@@ -4,6 +4,27 @@ import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Medal, Goal, Trophy} from 'lucide-react';
+import { UserContext } from '../components/userContext';
+import { motion, AnimatePresence } from "framer-motion";
+
+const containerVariants = {
+  initial: { opacity: 1 },
+  animate: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
+
+const sectionVariants = {
+  initial: { opacity: 0, y: 15 },
+  animate: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" }
+  }
+};
 
 export default function Gamifikasi() {
   const navigate = useNavigate();
@@ -12,34 +33,32 @@ export default function Gamifikasi() {
   const [mission, setMission] = useState(null);
 
   useEffect(() => {
-    api.get('/api/leaderboard')
-      .then(res => setLeaders(res.data.slice(0, 3)))
-      .catch(() => console.log('error leaderboard'));
+    Promise.all([
+      api.get('/api/leaderboard'),
+      api.get('/api/achievements'),
+      api.get('/api/mission')
+    ])
+    .then(([leaderboardRes, achievementsRes, missionRes]) => {
+      setLeaders(leaderboardRes.data.slice(0, 3));
+      setAchievements(achievementsRes.data);
+      setMission(missionRes.data);
+    })
+    .catch(err => {
+      console.log(err);
+    });
   }, []);
-
-  useEffect(() => {
-    api.get('/api/achievements')
-      .then(res => setAchievements(res.data))
-      .catch(() => console.log('error achievements'));
-  }, []);
-
-  useEffect(() => {
-    api.get('/api/mission')
-      .then(res => setMission(res.data))
-      .catch(() => console.log('error mission'));
-  }, []);
-
-
 
   const unlocked = achievements.filter(a => a.unlocked).length;
   const total = achievements.length;
 
-
-
   return (
-    <div className="">
-      
-      {/* 🏆 PAPAN PERINGKAT SECTION */}
+    <motion.div 
+      variants={containerVariants}
+      initial="initial"
+      animate="animate"
+    >
+      {/* PAPAN PERINGKAT */}
+      <motion.div variants={sectionVariants}>
       <div className="d-flex justify-content-between align-items-center mb-2">
         <h5 className="fw-bold m-0 d-flex align-items-center"><Medal size={20} className="me-2"/>Papan Peringkat</h5>
         <button onClick={() => navigate('/leaderboard')} className="btn btn-sm btn-link text-decoration-none text-muted fw-bold">Lihat Semua</button>
@@ -51,19 +70,14 @@ export default function Gamifikasi() {
             <div 
               key={user.id} 
               className={`py-3 text-center ${i !== 2 ? 'border-end' : ''}`}
-              style={{ 
-                flex: '1',      // Membagi 3 bagian sama besar (33.3%)
-                minWidth: '0'   // WAJIB: Agar teks panjang bisa terpotong (truncate)
-              }}
+              style={{flex: '1', minWidth: '0'}}
             >
-              {/* Badge Angka */}
               <div className="mb-2 d-flex justify-content-center">
                 <div className={`d-inline-flex align-items-center justify-content-center fw-bold text-white shadow-sm circle-badge rounded-circle ${i === 0 ? 'bg-warning' : i === 1 ? 'bg-secondary' : 'bg-danger'}`}>
                   {i + 1}
                 </div>
               </div>
 
-              {/* Foto Profil */}
               <div className='d-inline-block rounded-circle p-1 border shadow-sm '>
               <img
                 src={`/avatars/${user.avatar_key}.png`}
@@ -75,7 +89,6 @@ export default function Gamifikasi() {
               />
               </div>
 
-              {/* Username & XP */}
               <div className="px-3">
                 <p className="fw-bold m-0 text-truncate">
                   {user.username}
@@ -88,28 +101,16 @@ export default function Gamifikasi() {
           ))}
         </div>
       </div>
+      </motion.div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      {/* 🎯 MISI SECTION */}
+      {/* MISI */}
+      <motion.div variants={sectionVariants}>
       <h5 className="fw-bold mb-2 d-flex align-items-center"><Goal size={20} className="me-2"/>Misi Hari Ini</h5>
 
       <div className="card border-0 shadow rounded-4 p-3 mb-4 d-flex flex-row align-items-center">
         <div 
           className="rounded-3 p-3 me-3 text-white shadow-sm"
-          style={{ backgroundColor: "#FCB001"}} // Perbaikan di sini
+          style={{ backgroundColor: "#FCB001"}}
           onClick={() => navigate('/klasifikasi')}
         >
           <Camera size={30} fill='black' color='#FCB001' />
@@ -117,26 +118,16 @@ export default function Gamifikasi() {
 
         <div className="flex-grow-1">
           <h6 className="fw-bold m-0">Cari {mission?.target_item && mission.target_item.charAt(0).toUpperCase() + mission.target_item.slice(1)}</h6>
-          <p className="text-muted m-0 small">+20 XP</p>
+          <p className="text-muted m-0 small">+20 P</p>
         </div>
         <div className="fw-bold small text-muted">
           ({mission?.is_completed ? 1 : 0}/1)
         </div>
       </div>
+      </motion.div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-      {/* 🎖️ PENCAPAIAN SECTION */}
+      {/* ACHIEVEMENT */}
+      <motion.div variants={sectionVariants}>
       <h5 className="fw-bold m-0 d-flex align-items-center mb-2">
         <Trophy size={20} className="me-2"/>
         <span>Pencapaian</span>
@@ -176,7 +167,7 @@ export default function Gamifikasi() {
           ))}
         </div>
       </div>
-
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

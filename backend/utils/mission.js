@@ -1,3 +1,6 @@
+// generate misi harian 
+// ceklis nyocokin acvitity klasifikasi dengan misi
+
 const pool = require('../db');
 
 const getTodayMission = async () => {

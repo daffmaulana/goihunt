@@ -109,8 +109,6 @@ html, body {
   font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 1px;
-
-  opacity: 0.7;
 }
 
 .toast-message {
@@ -118,13 +116,63 @@ html, body {
   font-weight: 700;
 }
 
-/* BACKGROUND */
+.game-toast-content.xp {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  border: 3px solid;
+}
+
+.game-toast-content.xp.xp-gain {
+  background: linear-gradient(
+    135deg,
+    #fff7cc,
+    #ffd54f
+  );
+  border-color: #ffb300;
+}
+
+.game-toast-content.xp.xp-loss {
+  background: linear-gradient(
+    135deg,
+    #ffe9cc,
+    #ffa44f
+  );
+  border-color: #ff3c00;
+}
+
+.xp-gain-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d1b932, #ffd54f);
+  color: white;
+  flex-shrink: 0;
+}
+
+.xp-loss-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d14a32, #ff9e4f);
+  color: white;
+  flex-shrink: 0;
+}
+
 .auth-page {
   min-height: 100vh;
   background-color: #87CEFA;
 }
 
-/* TABS */
 .auth-tabs .btn {
   border: none;
   border-radius: 0;
@@ -143,22 +191,19 @@ html, body {
 .tab-inactive {
   background-color: rgba(255,255,255,0.4) !important;
   color: rgba(0,0,0,0.5) !important;
-  border-bottom: 1px solid !important; /* Agar tinggi tombol konsisten */
+  border-bottom: 1px solid !important;
   font-weight: 500;
 }
 
-/* INPUT DEFAULT */
 .form-control {
   border-radius: 10px;
   padding: 10px;
 }
 
-/* 🔥 NON ACTIVE (lebih redup) */
 .form-control::placeholder {
   color: #aaa;
 }
 
-/* 🔥 ACTIVE INPUT (lebih terang sesuai request kamu) */
 .form-control:focus {
   background-color: #ffffff !important;
   color: #000 !important;
@@ -166,7 +211,6 @@ html, body {
   box-shadow: 0 0 0 3px rgba(135,206,250,0.3) !important;
 }
 
-/* BUTTON */
 .btn-primary {
   background-color: #FCB001 !important;
   border: none !important;
@@ -175,7 +219,6 @@ html, body {
   border-radius: 10px;
 }
 
-/* HOVER */
 .btn-primary:hover {
   background-color: #e0a000 !important;
 }
@@ -183,43 +226,31 @@ html, body {
 .btn-outline-primary {
   background-color: transparent !important;
   color: #FCB001 !important;
-  border: 2px solid #FCB001 !important; /* Memberikan garis tepi sesuai warna primary */
+  border: 2px solid #FCB001 !important;
   font-weight: 600;
   border-radius: 10px;
 }
 
-/* HOVER OUTLINE PRIMARY */
 .btn-outline-primary:hover {
   background-color: #FCB001 !important;
-  color: black !important; /* Teks berubah jadi hitam saat background muncul */
+  color: black !important;
 }
-
-
-
-
-
-
-
-
-
 
 .xp-bar-modern {
   height: 24px;
-  background-color: #FCB001; /* Warna cokelat gelap seperti di gambar */
+  background-color: #FCB001; 
   border-radius: 12px;
   overflow: hidden;
-  border: 2px solid #006eff; /* Border agar terlihat lebih tegas */
+  border: 2px solid #006eff; 
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 }
 
-/* Bagian yang Mengisi (Warna Kuning/Emas) */
 .xp-fill-modern {
   height: 100%;
   background-color: #fcd601;
   border-radius: 10px;
 }
 
-/* Overlay Teks di Atas Bar */
 .xp-content {
   position: absolute;
   top: 0;
@@ -243,11 +274,10 @@ html, body {
   letter-spacing: 0.5px;
 }
 
-/* CSS untuk lingkaran serbaguna */
 .circle-badge {
   width: 30px;
   height: 30px;
-  line-height: 0; /* Menghilangkan extra space di bawah teks */
+  line-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;

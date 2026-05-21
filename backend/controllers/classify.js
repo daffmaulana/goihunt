@@ -2,8 +2,16 @@ const pool = require('../db');
 const { incrementAchievementProgress } = require('../utils/achievement');
 const { completeMissionIfTarget } = require('../utils/mission');
 const { addXpToUser } = require('../utils/xp');
-const xpRules = require('../config/xpRules');
 
+
+exports.getVocabLabels = async (req, res) => {
+  try {
+    const result = await pool.query('SELECT label FROM vocab');
+    res.json(result.rows.map((row) => row.label));
+  } catch (err) {
+    res.status(500).json({ code: 'SERVER_ERROR' });
+  }
+};
 
 exports.getClassify = async (req, res) => {
   try {
@@ -28,35 +36,42 @@ exports.getClassify = async (req, res) => {
     }
 
     const vocab = result.rows[0];
+    let xpChange = 0;
+    let missionXpChange = 0;
+    let missionCompleted = false;
 
     if (classify === 'true') {
+
+      let achievementCompleted = false;
       const today = new Date().toISOString().slice(0, 10);
 
-      // Check if already classified this vocab today
+      // cek udah klasifikasi hari ini?
       const alreadyClassified = await pool.query(
         'SELECT id FROM user_classify WHERE user_id = $1 AND vocab_id = $2 AND date = $3',
         [userId, vocab.id, today]
       );
 
+      // jika belum, maka dapat XP + progress achievement + catet hari ini udah classify objek ini biar ga spam
       if (alreadyClassified.rows.length === 0) {
-        // Award XP and increment achievement
-        await addXpToUser(userId, 'CLASSIFY');
-        await incrementAchievementProgress(userId, 'CLASSIFY');
+        const xpResult = await addXpToUser(userId, 'CLASSIFY');
+        xpChange = xpResult.gained;
 
-        // Insert record to prevent future spamming
+        await incrementAchievementProgress(userId, 'CLASSIFY');       
+
         await pool.query(
           'INSERT INTO user_classify (user_id, vocab_id, date) VALUES ($1, $2, $3)',
           [userId, vocab.id, today]
         );
       }
-
-      const missionCompleted = await completeMissionIfTarget(userId, vocab.label);
-      if (missionCompleted) {
+      missionCompleted = await completeMissionIfTarget(userId, vocab.label); // cek apakah mission berhasil?
+      if (missionCompleted) { // jika ya, maka tambahkan progress achievement
+        const missionXp = await addXpToUser(userId, 'MISSION');
+        missionXpChange = missionXp.gained;
         await incrementAchievementProgress(userId, 'MISSION');
       }
     }
 
-    res.json(vocab);
+    res.json({ ...vocab, xpChange, missionCompleted, missionXpChange });
 
   } catch (err) {
     res.status(500).json({

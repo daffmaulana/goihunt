@@ -16,6 +16,5 @@ export default function AuthGate({ children, type }) {
     return children;
   }
 
-  // fallback
   return children;
 }

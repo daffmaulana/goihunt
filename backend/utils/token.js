@@ -1,3 +1,6 @@
+// generate kebutuhan token JWT
+// accessToken = JWT token, refreshToken = renewal JWT, resetToken = reset pass token, hashToken = ya buat kasih hash token wkwk biar aman disimpen di DB
+
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 

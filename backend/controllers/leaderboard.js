@@ -6,9 +6,9 @@ const pool = require('../db');
 exports.getLeaderboard = async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT id, username, avatar_key, xp, level
+      SELECT id, username, avatar_key, xp, level, xp_timestamp
       FROM users
-      ORDER BY xp DESC, id ASC
+      ORDER BY xp DESC, xp_timestamp ASC
     `);
 
     res.json(result.rows);

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import api from '../api/axios';
-import { toast } from 'react-toastify';
+import { gameToast } from "../components/gameToast";
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 
@@ -67,7 +67,7 @@ export default function RegisterForm() {
         confirmPassword
       });
 
-      toast.success('Akun berhasil dibuat, silakan login', {
+      gameToast.success('Akun berhasil dibuat, silahkan login', {
         onClose: () => navigate('/')
       });
 
@@ -91,21 +91,21 @@ export default function RegisterForm() {
         }
 
         if (code === 'USER_EXISTS') {
-          toast.error(message, { toastId: code });
+          gameToast.error(message, { toastId: code });
           return;
         }
 
         if (code === 'SERVER_ERROR') {
-          toast.error('Server sedang bermasalah, coba lagi nanti', { toastId: code });
+          gameToast.error('Server sedang bermasalah, coba lagi nanti', { toastId: code });
           return;
         }
 
-        toast.error(message || 'Terjadi kesalahan yang tidak diketahui', { toastId: code });
+        gameToast.error(message || 'Terjadi kesalahan yang tidak diketahui', { toastId: code });
 
       } else if (err.request) {
-        toast.error('Tidak bisa terhubung ke server', { toastId: code });
+        gameToast.error('Tidak bisa terhubung ke server', { toastId: code });
       } else {
-        toast.error('Terjadi kesalahan pada client', { toastId: code });
+        gameToast.error('Terjadi kesalahan pada client', { toastId: code });
       }
     }
   };

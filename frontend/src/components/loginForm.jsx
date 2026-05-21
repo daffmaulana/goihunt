@@ -43,7 +43,7 @@ export default function LoginForm() {
         email,
         password
       });
-
+      
       localStorage.setItem('accessToken', res.data.accessToken);
 
       gameToast.success('Login akun berhasil', {
@@ -63,7 +63,6 @@ export default function LoginForm() {
           return;
         }
 
-        // 🔥 NON-VALIDATION → TOAST
         if (code === 'INVALID_CREDENTIALS') {
           gameToast.error(message, { toastId: code });
           return;
@@ -73,7 +72,6 @@ export default function LoginForm() {
           gameToast.error('Server sedang bermasalah, coba lagi nanti', { toastId: code });
           return;
         }
-
         gameToast.error(message || 'Terjadi kesalahan yang tidak diketahui', { toastId: code });
 
       } else if (err.request) {

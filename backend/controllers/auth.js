@@ -75,7 +75,7 @@ exports.register = async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({  code:'SERVER_ERROR', message: 'Terjadi kesalahan pada server, coba lagi' });
+    res.status(500).json({ code:'SERVER_ERROR', message: 'Terjadi kesalahan pada server, coba lagi' });
   }
 };
 
@@ -316,10 +316,10 @@ exports.resetPassword = async (req, res) => {
       [userId]
     );
 
-    res.json({ code:'PASSWORD_UPDATED', message: 'Password berhasil diubah dan silahkan login ulang' });
+    res.json({ code:'PASSWORD_UPDATED', message: 'Password diubah dan silahkan login ulang' });
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ code: 'SERVER_ERROR', message: 'Terjadi kesalahan pada server, coba lagi' });
+    res.status(500).json({ code:'SERVER_ERROR', message: 'Terjadi kesalahan pada server, coba lagi' });
   }
 };
