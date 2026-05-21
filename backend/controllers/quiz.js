@@ -69,7 +69,3 @@ if (!alreadyCorrect) {
     alreadyMastered: alreadyCorrect
   });
 };
-
-// {
-//     "vocabId": 15
-// }

@@ -20,4 +20,12 @@ if (process.env.DATABASE_URL) {
   });
 }
 
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('❌ Koneksi database GAGAL:', err.stack);
+  } else {
+    console.log('✅ Koneksi database BERHASIL! Waktu server DB:', res.rows[0].now);
+  }
+});
+
 module.exports = pool;
