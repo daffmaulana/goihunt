@@ -11,6 +11,7 @@ import Wrapper from './pages/wrapper';
 import Leaderboard from './pages/leaderboard';
 import Koleksi from './pages/koleksi';
 import { UserProvider } from './components/userContext';
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   return (
@@ -41,7 +42,7 @@ function App() {
           </Routes>
 
           <ToastContainer position="top-center" autoClose={1700} closeOnClick draggable closeButton={false} transition={Flip} className="custom-toast-container"/>
-
+          <Analytics />
         </div>
       </div>
     </UserProvider>
