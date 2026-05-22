@@ -18,7 +18,10 @@ const globalLimiter = rateLimit({
 // middleware
 // app.use(cors());
 // app.use(cors({origin: 'http://192.168.1.12:5173',credentials: true}));
-app.use(cors({origin: process.env.FRONTEND_URL || 'https://192.168.1.4:5173', credentials: true}));
+app.use(cors({origin: 
+  process.env.FRONTEND_URL,
+  // 'https://192.168.1.4:5173', 
+  credentials: true}));
 app.use(express.json());
 app.use(cookieParser());
 app.use(globalLimiter);

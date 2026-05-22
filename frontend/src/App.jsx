@@ -11,6 +11,7 @@ import Wrapper from './pages/wrapper';
 import Leaderboard from './pages/leaderboard';
 import Koleksi from './pages/koleksi';
 import { UserProvider } from './components/userContext';
+import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   return (
