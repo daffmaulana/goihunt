@@ -1,17 +1,17 @@
 // ngirim ngemail lewat smtp gmail
-
+require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USERASDSAD,
+    user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   }
 });
 
 exports.sendResetPasswordEmail = async (to, username, resetToken) => {
-  const resetLink = `http://192.168.1.4:5173/reset?token=${resetToken}`;
+  const resetLink = `${process.env.FRONTEND_URL}/reset?token=${resetToken}`;
 
   await transporter.sendMail({
     from: `"GoiHunt" <${process.env.EMAIL_USER}>`,

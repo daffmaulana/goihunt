@@ -99,11 +99,10 @@ export default function Leaderboard() {
 
                   <div className={`flex-shrink-0 rounded-circle p-1 border shadow-sm me-2 ${isMe ? 'border-primary' : 'bg-light'}`}>
                     <img
-                      src={`/avatars/${user.avatar_key}.png`}
+                      src={`/avatars/${user.avatar_key}.svg`}
                       width="40"
                       height="40"
                       className="p-1 img-fluid"
-                      alt="avatar"
                       draggable="false"
                       onContextMenu={(e) => e.preventDefault()}
                     />

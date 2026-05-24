@@ -241,7 +241,7 @@ export default function profile() {
             <div className="text-center mb-4">
               <div className="position-relative d-inline-block rounded-circle shadow-sm border p-1">
                 <img
-                  src={`/avatars/${avatarKey}.svg`}
+                  src={`/avatars/${avatarKey || 'bear'}.svg`}
                   alt="Avatar"
                   width={100}
                   height={100}
