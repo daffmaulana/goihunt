@@ -160,7 +160,7 @@ export default function resetPassword() {
       <div className="card shadow-lg p-4 rounded-4 w-100 ">
         <div className="text-center mb-4">
           <img 
-            src="/public/goihuntlogo.svg" 
+            src="/goihuntlogo.svg" 
             alt="GoiHunt Logo"
             className="img-fluid"
             draggable="false"

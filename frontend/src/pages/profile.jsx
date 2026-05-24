@@ -261,7 +261,7 @@ export default function profile() {
                   className={`btn btn-link rounded-circle shadow-sm border p-1 border-2 ${avatarKey === a ? 'border-primary' : 'border-transparent'}`}
                   disabled={profileLoading}
                 >
-                  <img draggable="false" src={`/avatars/${a}.svg`} width={45} className="p-1" onContextMenu={(e) => e.preventDefault()}/>
+                  <img draggable="false" src={`/avatars/${a}.svg`} width={45} height={45} className="p-1" onContextMenu={(e) => e.preventDefault()}/>
                 </button>
               ))}
             </div>
