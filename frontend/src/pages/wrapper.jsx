@@ -37,7 +37,7 @@ export default function Wrapper() {
                 width='50'
                 height='50'
                 className='p-1' 
-                src={`/avatars/${user.avatar_key}.png`} 
+                src={`/avatars/${user.avatar_key}.svg`} 
                 alt="avatar" 
                 draggable='false'
                 onContextMenu={(e) => e.preventDefault()}

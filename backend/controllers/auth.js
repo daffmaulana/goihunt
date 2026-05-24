@@ -81,26 +81,31 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    let { email, password } = req.body;
+    let { identifier, password } = req.body;
+    identifier = (identifier || '').toString().toLowerCase().trim();
 
-    if (!email || !password) {
-      return res.status(400).json({  code:'FIELD_MISSING', message: 'Email dan password wajib diisi' });
+    if (!identifier || !password) {
+      return res.status(400).json({ code:'FIELD_MISSING', message: 'Email/username dan password wajib diisi' });
     }
 
-    email = email.toLowerCase().trim();
+    let queryText;
 
-    // validasi format email
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({  code:'INVALID_EMAIL',  message: 'Format email tidak valid' });
+    if (identifier.includes('@')) { 
+      if (!emailRegex.test(identifier)) {
+        return res.status(400).json({ code:'INVALID_EMAIL', message: 'Format email tidak valid' });
+      }
+      queryText = 'SELECT id, email, username, password FROM users WHERE email = $1';
+    } else {
+      if (!usernameRegex.test(identifier)) {
+        return res.status(400).json({ code:'INVALID_USERNAME', message: 'Username tidak valid' });
+      }
+      queryText = 'SELECT id, email, username, password FROM users WHERE username = $1';
     }
 
-    const userQuery = await pool.query(
-      'SELECT id, email, password FROM users WHERE email = $1',
-      [email]
-    );
+    const userQuery = await pool.query(queryText, [identifier]);
 
     if (userQuery.rows.length === 0) {
-      return res.status(401).json({ code: 'INVALID_CREDENTIALS', message: 'Email atau password salah' });
+      return res.status(401).json({ code: 'INVALID_CREDENTIALS', message: 'Email/username atau password salah' });
     }
 
     const user = userQuery.rows[0];
@@ -108,7 +113,7 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return res.status(401).json({ code: 'INVALID_CREDENTIALS', message: 'Email atau password salah' });
+      return res.status(401).json({ code: 'INVALID_CREDENTIALS', message: 'Email/username atau password salah' });
     }
 
     const accessToken = generateAccessToken(user);
@@ -134,7 +139,8 @@ exports.login = async (req, res) => {
       accessToken,
       user: {
         id: user.id,
-        email: user.email
+        email: user.email,
+        username: user.username
       }
     });
 

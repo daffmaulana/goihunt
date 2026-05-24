@@ -7,7 +7,7 @@ import { gameToast } from './gameToast';
 import { Eye, EyeOff } from 'lucide-react';
 
 export default function LoginForm() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   
@@ -24,12 +24,8 @@ export default function LoginForm() {
 
     const newErrors = [];
 
-    if (!email) newErrors.push('Email wajib diisi');
+    if (!identifier) newErrors.push('Email atau username wajib diisi');
     if (!password) newErrors.push('Password wajib diisi');
-
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.push('Format email tidak valid');
-    }
 
     if (newErrors.length > 0) {
       setErrors(newErrors);
@@ -40,7 +36,7 @@ export default function LoginForm() {
 
     try {
       const res = await api.post('/auth/login', {
-        email,
+        identifier,
         password
       });
       
@@ -56,7 +52,7 @@ export default function LoginForm() {
       if (err.response) {
         const { code, message } = err.response.data;
 
-        const validationCodes = ['FIELD_MISSING', 'INVALID_EMAIL'];
+        const validationCodes = ['FIELD_MISSING', 'INVALID_EMAIL', 'INVALID_USERNAME'];
 
         if (validationCodes.includes(code)) {
           setErrors([message]);
@@ -87,9 +83,9 @@ export default function LoginForm() {
       <input
         type="email"
         className="form-control mb-3"
-        placeholder="Email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
+        placeholder="Email/username"
+        value={identifier}
+        onChange={e => setIdentifier(e.target.value)}
         disabled={loading}
       />
 

@@ -241,7 +241,7 @@ export default function profile() {
             <div className="text-center mb-4">
               <div className="position-relative d-inline-block rounded-circle shadow-sm border p-1">
                 <img
-                  src={`/avatars/${avatarKey}.png`}
+                  src={`/avatars/${avatarKey}.svg`}
                   alt="Avatar"
                   width={100}
                   height={100}
@@ -261,7 +261,7 @@ export default function profile() {
                   className={`btn btn-link rounded-circle shadow-sm border p-1 border-2 ${avatarKey === a ? 'border-primary' : 'border-transparent'}`}
                   disabled={profileLoading}
                 >
-                  <img draggable="false" src={`/avatars/${a}.png`} width={45} className="p-1" onContextMenu={(e) => e.preventDefault()}/>
+                  <img draggable="false" src={`/avatars/${a}.svg`} width={45} className="p-1" onContextMenu={(e) => e.preventDefault()}/>
                 </button>
               ))}
             </div>
