@@ -1,27 +1,16 @@
-// ngirim ngemail lewat smtp gmail
+// ngirim email lewat Resend API
 require('dotenv').config();
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  connectionTimeout: 10000,
-  logger: true, 
-  debug: true,
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 exports.sendResetPasswordEmail = async (to, username, resetToken) => {
   const resetLink = `${process.env.FRONTEND_URL}/reset?token=${resetToken}`;
 
-  await transporter.sendMail({
-    from: `"GoiHunt" <${process.env.EMAIL_USER}>`,
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
     to,
-    subject: 'Reset Password',
+    subject: 'Reset Password GoiHunt',
     html: `
       <div style="font-family: sans-serif; background-color: #f4f4f4; padding: 20px;">
         <table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #dddddd;">
