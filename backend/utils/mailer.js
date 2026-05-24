@@ -7,7 +7,11 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
-  }
+  },
+  port: 587,
+  secure: false,
+  host: 'smtp.gmail.com',
+  connectionTimeout: 10000
 });
 
 exports.sendResetPasswordEmail = async (to, username, resetToken) => {
