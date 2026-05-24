@@ -3,15 +3,16 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   },
-  port: 587,
-  secure: false,
-  host: 'smtp.gmail.com',
-  connectionTimeout: 10000
+  connectionTimeout: 10000,
+  logger: true, 
+  debug: true,
 });
 
 exports.sendResetPasswordEmail = async (to, username, resetToken) => {
