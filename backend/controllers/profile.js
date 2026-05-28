@@ -161,5 +161,5 @@ exports.updatePassword = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ code:'SERVER_ERROR', message: 'Terjadi kesalahan pada server, coba lagi' });
-  }
+  } 
 };

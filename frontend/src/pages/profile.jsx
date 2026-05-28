@@ -118,6 +118,8 @@ export default function profile() {
       } else {
         gameToast.error('Terjadi kesalahan pada client');
       }
+    } finally {
+      setProfileLoading(false);
     }
   };
 
@@ -199,7 +201,9 @@ export default function profile() {
     } else {
       gameToast.error('Terjadi kesalahan pada client', { toastId: code });
     }
-    }
+    } finally {
+    setPasswordLoading(false);
+}
   };
 
   const handleLogout = async () => {

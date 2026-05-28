@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-// app.set('trust proxy', true)
 const cors = require('cors');
 const port = process.env.PORT || 3000;
 const authMiddleware = require('./middlewares/auth');
@@ -22,6 +21,7 @@ const globalLimiter = rateLimit({
 app.use(cors({origin: 
   process.env.FRONTEND_URL,
   // 'https://192.168.1.7:5173', 
+  // 'https://172.25.20.82:5173', 
   credentials: true}));
 app.use(express.json());
 app.use(cookieParser());

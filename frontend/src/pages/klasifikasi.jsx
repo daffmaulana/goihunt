@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useRef, useState, useContext, useTransition } from "react";
 import * as tf from "@tensorflow/tfjs";
 import { gameToast } from "../components/gameToast";
-import { X, Library, ImageIcon, PackagePlus, PackageX } from "lucide-react";
+import { X, Library, ImageIcon, PackagePlus, PackageX, CameraOff, AlertCircle, CheckCircle2, Loader } from "lucide-react";
 import api from "../api/axios";
 import { UserContext } from '../components/userContext';
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,9 +23,13 @@ export default function Klasifikasi() {
   const [isLoading, setIsLoading] = useState(false);
   const [showLabelPicker, setShowLabelPicker] = useState(false);
   const [labelCandidates, setLabelCandidates] = useState([]);
-  const [gameLabels, setGameLabels] = useState(new Set());
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [answerResult, setAnswerResult] = useState(null);
+  const [cameraError, setCameraError] = useState(null);
+  const [confidenceRate, setConfidenceRate] = useState(null);
+  const [isModelLoading, setIsModelLoading] = useState(true);
+  const [isModelReady, setIsModelReady] = useState(false);
+  const [modelError, setModelError] = useState(null);
   const { refreshUser } = useContext(UserContext);
   const [isPending, startTransition] = useTransition();
 
@@ -47,39 +51,67 @@ export default function Klasifikasi() {
   };
 
   // layer preprocess input raw image
-  const preprocessImage = (img) =>
-  tf.browser
-    .fromPixels(img)
-    .resizeNearestNeighbor([224, 224])
-    .toFloat()
-    .div(127.5)
-    .sub(1)
-    .expandDims();
+  // Model sudah include preprocessing layer (MobileNetV2 preprocess_input)
+  // Kirim pixel value mentah (uint8: 0-255), jangan normalisasi manual
+  const preprocessImage = (img) => {
+    return tf.tidy(() => {
+      // 1. Ubah gambar dari elemen HTML (img/video/canvas) menjadi tensor
+      const tensor = tf.browser.fromPixels(img)
+        // 2. Resize ke 224x224 dengan metode Bilinear (lebih halus)
+        .resizeBilinear([224, 224])
+        // 3. Ubah tipe data menjadi float32 karena kita akan melakukan pembagian
+        .cast('float32');
+
+      // 4. KUNCI UTAMA: Normalisasi ala MobileNetV2 (-1 hingga 1)
+      // Rumus aslinya di Python: (piksel / 127.5) - 1.0
+      const normalized = tensor.div(tf.scalar(127.5)).sub(tf.scalar(1.0));
+
+      // 5. Tambah dimensi batch di awal (menjadi bentuk [1, 224, 224, 3])
+      const finalTensor = normalized.expandDims(0);
+
+      return finalTensor;
+    });
+  };
 
   // load model + label
   useEffect(() => {
     const loadResources = async () => {
       try {
-        const [loadedModel, labelText, vocabLabelsRes] = await Promise.all([
-          tf.loadGraphModel("/model/model.json"),
+        console.log("Loading model...");
+        setIsModelLoading(true);
+        setModelError(null);
+        setIsModelReady(false);
+        
+        const [loadedModel, labelText] = await Promise.all([
+          tf.loadLayersModel("/model/model.json").catch(err => {
+            console.error("Model loading error:", err);
+            throw err;
+          }),
           fetch("/model/labels.txt").then((r) => r.text()),
-          api.get("/api/classify/labels/list"),
         ]);
+        
+        console.log("Model loaded successfully");
         modelRef.current = loadedModel;
         setModel(loadedModel);
-        const cleanLabels = labelText.split("\n").map((line) => {
-          const trimmed = line.trim();
-          if (!trimmed) return "";
-          return trimmed
-            .split(",")[0]
+        
+        const cleanLabels = labelText
+        .split("\n")
+        .map((line) =>
+          line
             .trim()
             .toLowerCase()
-            .replace(/\s+/g, "_");
-        });
+            .replace(/\s+/g, "_")
+        )
+        
+        console.log("Labels loaded:", cleanLabels);
         setLabels(cleanLabels);
-        setGameLabels(new Set(vocabLabelsRes.data));
+        setIsModelReady(true);
+        setIsModelLoading(false);
       } catch (err) {
         console.error("Failed to load resources:", err);
+        const errorMsg = err.message || "Gagal load model. Periksa console untuk detail.";
+        setModelError(errorMsg);
+        setIsModelLoading(false);
       }
     };
     loadResources();
@@ -106,8 +138,21 @@ export default function Klasifikasi() {
         localStream = stream;
         streamRef.current = stream;
         setCameraOn(true);
+        setCameraError(null);
       } catch (err) {
         console.error("Camera error:", err);
+        setCameraOn(false);
+        
+        // Determine the type of error
+        if (err.name === "NotAllowedError") {
+          setCameraError("Akses kamera ditolak. Cek pengaturan browser kamu.");
+        } else if (err.name === "NotFoundError") {
+          setCameraError("Kamera tidak ditemukan di perangkat ini.");
+        } else if (err.name === "NotReadableError") {
+          setCameraError("Kamera sedang digunakan oleh aplikasi lain.");
+        } else {
+          setCameraError("Gagal mengakses kamera. Gunakan galeri sebagai alternatif.");
+        }
       }
     };
 
@@ -206,7 +251,6 @@ export default function Klasifikasi() {
     (data) => {
       const ranked = data
         .map((confidence, index) => ({ index, confidence }))
-        .filter(({ index }) => labels[index]?.toLowerCase() !== "background")
         .sort((a, b) => b.confidence - a.confidence);
 
       const toCandidate = ({ index, confidence }) => ({
@@ -220,20 +264,19 @@ export default function Klasifikasi() {
       const top = ranked
         .filter(
           ({ index, confidence }) =>
-            gameLabels.has(labels[index]) && Math.round(confidence * 100) > 0
+            Math.round(confidence * 100) > 0
         )
         .slice(0, 3)
         .map(toCandidate);
 
       console.log("=== ALL PREDICTIONS (Ranked) ===");
-      ranked.slice(0, 20).forEach((item, idx) => {
-        console.log(
-          `${idx + 1}. ${labels[item.index]} → ${(item.confidence * 100).toFixed(2)}%`
+      ranked.slice(0, 10).forEach((item, idx) => {
+        console.log(`${idx + 1}. ${labels[item.index]} → ${(item.confidence * 100).toFixed(2)}%`
         );
       });
       console.log("\n=== BEST (All Labels) ===");
       console.log(`${best?.displayName} → ${(best?.confidence * 100).toFixed(2)}%`);
-      console.log("\n=== TOP-3 (Game Labels Only) ===");
+      console.log("=== TOP-3 ===");
       top.forEach((candidate, idx) => {
         console.log(
           `${idx + 1}. ${candidate.displayName} → ${(candidate.confidence * 100).toFixed(2)}%`
@@ -243,7 +286,7 @@ export default function Klasifikasi() {
 
       return { top, best };
     },
-    [labels, gameLabels]
+    [labels]
   );
 
   // open label confidence rendah
@@ -272,11 +315,10 @@ export default function Klasifikasi() {
         img.src = imageSrc;
         img.onload = async () => {
           const tensor = preprocessImage(img);
-          const logits = modelRef.current.execute(tensor);
-          const probabilities = tf.softmax(logits);
-          const data = await probabilities.data();
+          const predictions = modelRef.current.predict(tensor);
+          const data = await predictions.data();
           const result = parsePredictions(Array.from(data));
-          tf.dispose([tensor, logits, probabilities]);
+          tf.dispose([tensor, predictions]);
           resolve(result);
         };
       }),
@@ -313,16 +355,27 @@ export default function Klasifikasi() {
       }
       const { best, top } = result;
       topCandidates = top;
-      const needsPicker =
-        best.confidence < 0.5 || !gameLabels.has(best.label);
+      console.log("BEST PREDICTION:", {
+        label: best.label,
+        confidence: best.confidence,
+        percentage: (best.confidence * 100).toFixed(2) + "%"
+      });
+      
+      const needsPicker = best.confidence < 0.5;
+      console.log("butuh picker?", needsPicker, "(confidence < 0.5)");
 
       if (needsPicker) {
+        console.log("confidence terlalu rendah, buka picker");
         openLabelPicker(top);
         return;
       }
+      console.log("confidence tinggi, classify dengan label:", best.label);
+      setConfidenceRate(best.confidence);
       await classifyWithLabel(best.label);
     } catch (err) {
+      console.log("ERROR:", err.response?.status, err.message);
       if (err.response?.status === 404) {
+        console.log("Label tidak ada di database, buka picker dengan top candidates");
         openLabelPicker(topCandidates);
       } else {
         gameToast.error("Terjadi kesalahan");
@@ -336,6 +389,8 @@ export default function Klasifikasi() {
   // label picker
   const handleLabelPick = async (label) => {
     setShowLabelPicker(false);
+    const selected = labelCandidates.find(c => c.label === label);
+    if (selected) setConfidenceRate(selected.confidence);
     setLabelCandidates([]);
     setIsLoading(true);
     try {
@@ -354,6 +409,7 @@ export default function Klasifikasi() {
     setLabelCandidates([]);
     setPreviewMode(false);
     setCapturedImage(null);
+    setConfidenceRate(null);
   };
 
   // crop dari input galeri
@@ -413,7 +469,8 @@ export default function Klasifikasi() {
       >
       <div className="w-100 d-flex flex-column">
 
-        <h5 className="fw-bold text-center">Cari Objek!</h5>
+        <h5 className="fw-bold text-center m-0">Cari Objek!</h5>
+        <small className="text-muted text-center text-small m-2">Pastikan cahaya ideal, objek memenuhi panduan batas potong, dan posisi dari depan.</small>
 
         {cameraOn && !previewMode && !showLabelPicker && (
           <div
@@ -440,6 +497,48 @@ export default function Klasifikasi() {
           </div>
         )}
 
+        {cameraError && !previewMode && !showLabelPicker && (
+          <div
+            className="glass-popup overflow-hidden rounded-3 shadow-lg mb-4 w-100 d-flex align-items-center justify-content-center"
+            style={{ maxWidth: "360px", position: "relative", height: "280px", background: "rgba(255, 107, 107, 0.1)", border: "2px solid rgba(255, 107, 107, 0.5)" }}
+          >
+            <div className="text-center px-3">
+              <div style={{ marginBottom: "12px" }}>
+                <CameraOff size={48} className="text-muted" style={{ margin: "0 auto", display: "block" }} />
+              </div>
+              <p className="text-muted mb-2" style={{ fontSize: "14px", fontWeight: "500" }}>
+                {cameraError}
+              </p>
+              <small className="text-muted" style={{ fontSize: "12px" }}>
+                Sebagai alternatif, gunakan fitur <strong>Galeri</strong> untuk memilih foto.
+              </small>
+            </div>
+          </div>
+        )}
+
+        
+        <div className="mb-3 d-flex align-items-center gap-2" style={{ fontSize: '13px' }}>
+          {isModelLoading && (
+            <>
+              <Loader size={16} className="text-warning" style={{ animation: 'spin 1s linear infinite' }} />
+              <span>Status model: Loading...</span>
+            </>
+          )}
+          {modelError && (
+            <>
+              <AlertCircle size={16} className="text-danger" />
+              <span>Status model: Gagal dimuat</span>
+            </>
+          )}
+          {isModelReady && !isModelLoading && (
+            <>
+              <CheckCircle2 size={16} className="text-success" />
+              <span>Status model: Siap</span>
+            </>
+          )}
+        </div>
+        <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+
         <div
           className="d-flex justify-content-between align-items-center w-100"
           style={{ maxWidth: "380px" }}
@@ -447,8 +546,16 @@ export default function Klasifikasi() {
           {/* Galeri */}
           <button
             onClick={() => document.getElementById("galleryInput").click()}
+            disabled={!isModelReady || isModelLoading}
             className="btn p-0 text-dark text-center"
-            style={{ width: "70px", minWidth: "60px", fontSize: "12px" }}
+            style={{ 
+              width: "70px", 
+              minWidth: "60px", 
+              fontSize: "12px",
+              opacity: !isModelReady || isModelLoading ? 0.5 : 1,
+              cursor: !isModelReady || isModelLoading ? 'not-allowed' : 'pointer',
+            }}
+            title={!isModelReady ? "Model sedang dimuat..." : "Pilih dari galeri"}
           >
             <div
               className="glass-card-item rounded-3 mb-1 d-flex align-items-center justify-content-center shadow-sm mx-auto"
@@ -466,6 +573,7 @@ export default function Klasifikasi() {
           >
             <button
               onClick={capturePhoto}
+              disabled={!isModelReady || isModelLoading}
               className="btn rounded-circle p-0 flex-shrink-0 bg-white"
               style={{
                 width: "clamp(44px, 14vw, 60px)",
@@ -473,7 +581,10 @@ export default function Klasifikasi() {
                 border: "none",
                 outline: "4px solid white",
                 outlineOffset: "7px",
+                opacity: !isModelReady || isModelLoading ? 0.5 : 1,
+                cursor: !isModelReady || isModelLoading ? 'not-allowed' : 'pointer',
               }}
+              title={!isModelReady ? "Model sedang dimuat..." : "Ambil foto"}
             />
           </div>
 
@@ -673,6 +784,11 @@ export default function Klasifikasi() {
                     <small className="text-muted">{vocabDetail.furigana}</small>
                     <h2 className="fw-bold m-0">{vocabDetail.kanji}</h2>
                     <small className="text-muted">{vocabDetail.romaji}</small>
+                    {confidenceRate !== null && (
+                      <div style={{ fontSize: '11px' }} className="text-muted mt-1">
+                        Kepercayaan: {Math.round(confidenceRate * 100)}%
+                      </div>
+                    )}
                   </div>
 
                   <button
