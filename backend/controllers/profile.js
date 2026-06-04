@@ -145,17 +145,6 @@ exports.updatePassword = async (req, res) => {
       [hashed, userId]
     );
 
-    await pool.query(
-    'DELETE FROM refresh_tokens WHERE user_id = $1',
-    [userId]
-    );
-
-    res.clearCookie('refreshToken', {
-    httpOnly: true,
-    sameSite: 'strict',
-    secure: false
-    });
-
     res.json({ code:'PASSWORD_UPDATED', message: 'Password berhasil diubah dan silahkan login ulang' });
 
   } catch (err) {

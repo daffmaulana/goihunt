@@ -2,8 +2,8 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 
-  import.meta.env.VITE_API_URL,
-  // 'http://192.168.1.7:3000',
+  // import.meta.env.VITE_API_URL,
+  'http://192.168.1.7:3000',
   // 'http://172.25.20.82:3000',
   withCredentials: true
 });
@@ -33,31 +33,17 @@ api.interceptors.response.use(
       '/auth/login',
       '/auth/register',
       '/auth/forgot-password',
-      '/auth/reset-password',
-      '/auth/refresh'
+      '/auth/reset-password'
     ];
 
+    // Jika token expired, langsung logout tanpa mencoba refresh
     if (
       err.response?.status === 401 &&
-      !originalRequest._retry &&
       !authEndpoints.some(path => originalRequest.url.includes(path))
     ) {
-      originalRequest._retry = true;
-      console.log("%c[Auth] Access Token expired. Attempting refresh...");
-
-      try {
-        const res = await api.post('/auth/refresh');
-        localStorage.setItem('accessToken', res.data.accessToken);
-        console.log("%c[Auth] Refresh Success! New Token obtained.");
-
-        originalRequest.headers.Authorization =
-          `Bearer ${res.data.accessToken}`;
-
-        return api(originalRequest);
-      } catch {
-        localStorage.removeItem('accessToken');
-        window.location.href = '/auth';
-      }
+      console.log("%c[Auth] Access Token expired. Logging out...");
+      localStorage.removeItem('accessToken');
+      window.location.href = '/auth';
     }
 
     return Promise.reject(err);

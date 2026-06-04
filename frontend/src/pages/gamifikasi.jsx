@@ -35,9 +35,9 @@ export default function Gamifikasi() {
 
   useEffect(() => {
     Promise.all([
-      api.get('/api/leaderboard/top3'),
-      api.get('/api/achievements'),
-      api.get('/api/mission')
+      api.get('leaderboard/top3'),
+      api.get('/achievements'),
+      api.get('/mission')
     ])
     .then(([leaderboardRes, achievementsRes, missionRes]) => {
       setLeaders(leaderboardRes.data);

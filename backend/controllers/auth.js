@@ -3,7 +3,7 @@
 
 const bcrypt = require('bcrypt');
 const pool = require('../db');
-const { generateAccessToken, generateResetToken, generateRefreshToken, hashToken } = require('../utils/token');
+const { generateAccessToken, generateResetToken, hashToken } = require('../utils/token');
 const { sendResetPasswordEmail } = require('../utils/mailer');
 const { checkAchievements } = require('../utils/achievement');
 
@@ -11,7 +11,7 @@ const usernameRegex = /^[a-z0-9_]{3,20}$/;
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).+$/;
 
-// Register, Login, Refresh, Logout, Forgot password, Reset Password
+// Register, Login, Logout, Forgot password, Reset Password
 
 exports.register = async (req, res) => {
   try {
@@ -117,23 +117,6 @@ exports.login = async (req, res) => {
     }
 
     const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken();
-    const hashedRefreshToken = hashToken(refreshToken);
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 1); // 1 hari
-
-    await pool.query(
-      `INSERT INTO refresh_tokens (user_id, token, expires_at)
-       VALUES ($1, $2, $3)`,
-      [user.id, hashedRefreshToken, expiresAt]
-    );
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: true, // true kalau HTTPS / false
-      sameSite: 'none', // none kalau https, strict kalau local
-      maxAge: 1 * 24 * 60 * 60 * 1000 // 1 hari
-    });
 
     res.json({
       accessToken,
@@ -152,62 +135,12 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.refresh = async (req, res) => {
-  try {
-    const refreshToken = req.cookies?.refreshToken;
-
-    if (!refreshToken) {
-      return res.status(401).json({ code:'INVALID_TOKEN', message: 'Refresh token missing' });
-    }
-
-    const hashedToken = hashToken(refreshToken);
-
-    const tokenQuery = await pool.query(
-      `SELECT rt.*, u.id, u.email
-       FROM refresh_tokens rt
-       JOIN users u ON u.id = rt.user_id
-       WHERE rt.token = $1 AND rt.expires_at > NOW()`,
-      [hashedToken]
-    );
-
-    if (tokenQuery.rows.length === 0) {
-      return res.status(401).json({ code: 'INVALID_TOKEN', message: 'Invalid refresh token' });
-    }
-
-    const user = tokenQuery.rows[0];
-
-    const newAccessToken = generateAccessToken(user);
-
-    res.json({ accessToken: newAccessToken });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ code:'SERVER_ERROR', message: 'Terjadi kesalahan pada server, coba lagi' });
-  }
-};
 
 exports.logout = async (req, res) => {
   try {
-    const refreshToken = req.cookies?.refreshToken;
-
-    if (refreshToken) {
-      const hashedToken = hashToken(refreshToken);
-
-      await pool.query(
-        'DELETE FROM refresh_tokens WHERE token = $1',
-        [hashedToken]
-      );
-    }
-
-    res.clearCookie('refreshToken', {
-      httpOnly: true,
-      sameSite: 'none',
-      secure: true // true jika HTTPS
-    });
-
     res.json({ code:'LOGGED_OUT', message: 'Logged out successfully' });
 
-    // Then, di frontend akan menghapus AccessToken.
+    // Frontend akan menghapus AccessToken dari localStorage.
 
   } catch (err) {
     console.error(err);
@@ -314,11 +247,6 @@ exports.resetPassword = async (req, res) => {
 
     await pool.query(
       'DELETE FROM password_resets WHERE user_id = $1',
-      [userId]
-    );
-
-    await pool.query(
-      'DELETE FROM refresh_tokens WHERE user_id = $1',
       [userId]
     );
 

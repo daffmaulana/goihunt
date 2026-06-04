@@ -42,7 +42,7 @@ export default function profile() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    api.get('/api/profile')
+    api.get('/profile')
       .then(res => {
         setProfile(res.data);
         setUsername(res.data.username);
@@ -82,7 +82,7 @@ export default function profile() {
     setProfileLoading(true);
 
     try {
-      const res = await api.put('/api/profile', payload);
+      const res = await api.put('/profile', payload);
 
       gameToast.success(res.data.message, {
         onClose: () => setProfileLoading(false)
@@ -152,7 +152,7 @@ export default function profile() {
   setPasswordLoading(true);
 
   try {
-    const res = await api.put('/api/profile/password', {
+    const res = await api.put('/profile/password', {
       currentPassword,
       newPassword,
       confirmPassword

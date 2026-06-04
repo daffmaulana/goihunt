@@ -51,22 +51,22 @@ export default function Klasifikasi() {
   };
 
   // layer preprocess input raw image
-  // Model sudah include preprocessing layer (MobileNetV2 preprocess_input)
-  // Kirim pixel value mentah (uint8: 0-255), jangan normalisasi manual
+  // model sudah include preprocessing layer (MobileNetV2 preprocess_input)
+  // kirim pixel value mentah (uint8: 0-255), jangan normalisasi manual
   const preprocessImage = (img) => {
     return tf.tidy(() => {
-      // 1. Ubah gambar dari elemen HTML (img/video/canvas) menjadi tensor
+      // Ubah gambar dari elemen HTML (img/video/canvas) menjadi tensor
       const tensor = tf.browser.fromPixels(img)
-        // 2. Resize ke 224x224 dengan metode Bilinear (lebih halus)
+        // resize ke 224x224 dengan metode Bilinear (lebih halus)
         .resizeBilinear([224, 224])
-        // 3. Ubah tipe data menjadi float32 karena kita akan melakukan pembagian
+        // ubah tipe data menjadi float32 karena kita akan melakukan pembagian
         .cast('float32');
 
-      // 4. KUNCI UTAMA: Normalisasi ala MobileNetV2 (-1 hingga 1)
-      // Rumus aslinya di Python: (piksel / 127.5) - 1.0
+      // normalisasi MobileNetV2 (-1 sampe 1)
+      // rumus aslinya di Python: (piksel / 127.5) - 1.0
       const normalized = tensor.div(tf.scalar(127.5)).sub(tf.scalar(1.0));
 
-      // 5. Tambah dimensi batch di awal (menjadi bentuk [1, 224, 224, 3])
+      // tambah dimensi batch di awal (menjadi bentuk [1, 224, 224, 3])
       const finalTensor = normalized.expandDims(0);
 
       return finalTensor;
@@ -78,6 +78,11 @@ export default function Klasifikasi() {
     const loadResources = async () => {
       try {
         console.log("Loading model...");
+        await tf.setBackend("cpu");
+        await tf.ready();
+
+        console.log("Backend:", tf.getBackend());
+
         setIsModelLoading(true);
         setModelError(null);
         setIsModelReady(false);
@@ -178,7 +183,7 @@ export default function Klasifikasi() {
   // kuis
   const loadQuiz = async (vocabId) => {
     try {
-      const res = await api.get(`/api/quiz/${vocabId}`);
+      const res = await api.get(`/quiz/${vocabId}`);
       setQuiz(res.data);
       setShowQuiz(true);
     } catch (err) {
@@ -191,7 +196,7 @@ export default function Klasifikasi() {
     try {
       setSelectedAnswer(answer);
 
-      const res = await api.post("/api/quiz/submit", {
+      const res = await api.post("/quiz/submit", {
         quizId: quiz.id,
         answer,
         vocabId: quiz.vocab_id,
@@ -297,7 +302,6 @@ export default function Klasifikasi() {
       return false;
     }
     
-    // Wrap state updates dalam transition untuk defer rendering
     startTransition(() => {
       setLabelCandidates(candidates);
       setShowLabelPicker(true);
@@ -327,7 +331,7 @@ export default function Klasifikasi() {
 
   // classify label yang terpilih
   const classifyWithLabel = async (label) => {
-    const res = await api.get(`/api/classify/${label}?classify=true`);
+    const res = await api.get(`/classify/${label}?classify=true`);
     const vocab = res.data;
     if (vocab.xpChange > 0) 
       {gameToast.xp(vocab.xpChange, `BERHASIL CARI ${vocab.label.toUpperCase()} HARI INI`);
@@ -343,7 +347,6 @@ export default function Klasifikasi() {
 
   // confirm lanjutkan dari modal preview
   const handleUsePhoto = async () => {
-    setPreviewMode(false);
     setIsLoading(true);
     let topCandidates = [];
     try {
@@ -366,19 +369,23 @@ export default function Klasifikasi() {
 
       if (needsPicker) {
         console.log("confidence terlalu rendah, buka picker");
+        setPreviewMode(false);
         openLabelPicker(top);
         return;
       }
       console.log("confidence tinggi, classify dengan label:", best.label);
       setConfidenceRate(best.confidence);
+      setPreviewMode(false);
       await classifyWithLabel(best.label);
     } catch (err) {
       console.log("ERROR:", err.response?.status, err.message);
       if (err.response?.status === 404) {
         console.log("Label tidak ada di database, buka picker dengan top candidates");
+        setPreviewMode(false);
         openLabelPicker(topCandidates);
       } else {
         gameToast.error("Terjadi kesalahan");
+        setPreviewMode(true);
       }
     } finally {
       setIsLoading(false);
@@ -446,10 +453,10 @@ export default function Klasifikasi() {
   const toggleCollection = async () => {
     try {
       if (isCollected) {
-        await api.delete(`/api/collection/${vocabDetail.id}`);
+        await api.delete(`/collection/${vocabDetail.id}`);
         gameToast.info("Dihapus dari koleksi");
       } else {
-        await api.post("/api/collection", { vocabId: vocabDetail.id });
+        await api.post("/collection", { vocabId: vocabDetail.id });
         gameToast.success("Ditambahkan ke koleksi");
       }
       setIsCollected(!isCollected);
@@ -628,11 +635,31 @@ export default function Klasifikasi() {
               onClick={(e) => e.stopPropagation()}
               variants={fadeInUp}
             >
-              <div className="p-4 text-center">
+              <div className="p-4 text-center position-relative">
+                {isLoading && (
+                  <div
+                    className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center rounded-5"
+                    style={{
+                      background: "rgba(255, 255, 255, 0.9)",
+                      backdropFilter: "blur(4px)",
+                    }}
+                  >
+                    <div className="text-center">
+                      <div
+                        className="spinner-border text-warning mb-2"
+                        role="status"
+                        style={{ width: "40px", height: "40px" }}
+                      >
+                        <span className="visually-hidden">Loading...</span>
+                      </div>
+                      <small className="d-block text-muted">Menganalisis objek...</small>
+                    </div>
+                  </div>
+                )}
                 <div className="mb-3 bg-white p-3 rounded-4"><h5 className="m-0 fw-bold text-black">Pratinjau Tangkapan</h5></div>
                 <img src={capturedImage} className="w-100 rounded-4 mb-3 border border-white border-4" alt="captured" />
                 <div className="d-flex gap-2">
-                  <button className="bg-danger text-white btn glass-nav-btn w-100 rounded-pill shadow-sm" onClick={retakePhoto}>Ulangi Foto</button>
+                  <button className="bg-danger text-white btn glass-nav-btn w-100 rounded-pill shadow-sm" onClick={retakePhoto} disabled={isLoading}>Ulangi Foto</button>
                   <button className="bg-success text-white btn glass-nav-btn w-100 rounded-pill shadow-sm" onClick={handleUsePhoto} disabled={isLoading}>
                     {isLoading ? "Memproses..." : "Lanjutkan"}
                   </button>

@@ -16,7 +16,6 @@ import { Analytics } from "@vercel/analytics/react"
 
 function App() {
   return (
-    // <DeviceCheck>
       <UserProvider>
         <div className="bg-dark min-vh-100 d-flex justify-content-center">
           <div className="app-container bg-white min-vh-100 shadow">
@@ -48,7 +47,6 @@ function App() {
           </div>
         </div>
       </UserProvider>
-    // </DeviceCheck>
   );
 }
 

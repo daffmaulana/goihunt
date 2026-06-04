@@ -8,7 +8,7 @@ export function UserProvider({ children }) {
 
   const refreshUser = useCallback(async () => {
     try {
-      const res = await api.get('/api/profile');
+      const res = await api.get('/profile');
       setUser(res.data);
       return res.data;
     } catch (err) {

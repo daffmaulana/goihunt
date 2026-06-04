@@ -48,7 +48,7 @@ export default function Koleksi() {
 
   const fetchCollections = async () => {
     try {
-      const res = await api.get('/api/collection');
+      const res = await api.get('/collection');
       const mapped = res.data.map((item) => ({
         ...item
       }));
@@ -93,7 +93,7 @@ export default function Koleksi() {
     if (!selected) return;
 
     try {
-      await api.delete(`/api/collection/${selected.id}`);
+      await api.delete(`/collection/${selected.id}`);
 
       setCollections((prev) =>
         prev.filter((item) => item.id !== selected.id)

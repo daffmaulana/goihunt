@@ -30,13 +30,13 @@ export default function Leaderboard() {
   const [me, setMe] = useState(null);
 
   useEffect(() => {
-    api.get('/api/leaderboard')
+    api.get('/leaderboard')
       .then(res => setUsers(res.data))
       .catch(() => console.log('error leaderboard'));
   }, []);
 
   useEffect(() => {
-  api.get('/api/profile')
+  api.get('/profile')
     .then(res => setMe(res.data))
 }, []);
 
