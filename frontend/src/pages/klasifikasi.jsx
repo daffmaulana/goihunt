@@ -227,7 +227,8 @@ export default function Klasifikasi() {
         
         setTimeout(() => {
           setShowVocab(true); 
-        }, 300);
+        }, 200);
+
       }, 1200);
       
     } catch {
