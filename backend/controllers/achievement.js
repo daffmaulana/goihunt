@@ -9,7 +9,6 @@ exports.getAchievements = async (req, res) => {
 try {
     const userId = req.user.userId;
 
-    // Use a LEFT JOIN to get all achievements and the unlock date for this specific user
     const query = `
       SELECT 
         a.id, a.code, a.icon, a.name, a.deskripsi, 
@@ -26,18 +25,18 @@ try {
       icon: a.icon,
       name: a.name,
       deskripsi: a.deskripsi,
-      unlocked: !!a.unlocked_at, // true if timestamp exists
-      unlocked_at: a.unlocked_at // keep this for sorting
+      unlocked: !!a.unlocked_at, 
+      unlocked_at: a.unlocked_at 
     }));
 
     result.sort((a, b) => {
       if (a.unlocked === b.unlocked) {
         if (a.unlocked) {
-          return new Date(a.unlocked_at) - new Date(b.unlocked_at); // Newest unlocked first
+          return new Date(a.unlocked_at) - new Date(b.unlocked_at); 
         }
         return 0; 
       }
-      return a.unlocked ? -1 : 1; // Move unlocked to the top
+      return a.unlocked ? -1 : 1; 
     });
 
     res.json(result);

@@ -3,6 +3,7 @@ import api from '../api/axios';
 import { ArrowLeft, ChevronLeft, ChevronRight, PackageX, X } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
+import { gameToast } from '../components/gameToast';
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 20 },
@@ -100,6 +101,8 @@ export default function Koleksi() {
       );
 
       setSelected(null);
+
+      gameToast.success("Berhasil menghapus koleksi")
 
     } catch (err) {
       console.log('delete collection error');

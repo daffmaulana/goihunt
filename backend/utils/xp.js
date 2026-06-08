@@ -47,3 +47,4 @@ const addXpToUser = async (userId, type, customAmount = null) => {
 };
 
 module.exports = { addXpToUser, upLevel };
+

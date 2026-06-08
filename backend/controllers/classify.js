@@ -3,16 +3,6 @@ const { incrementAchievementProgress } = require('../utils/achievement');
 const { completeMissionIfTarget } = require('../utils/mission');
 const { addXpToUser } = require('../utils/xp');
 
-
-exports.getVocabLabels = async (req, res) => {
-  try {
-    const result = await pool.query('SELECT label FROM vocab');
-    res.json(result.rows.map((row) => row.label));
-  } catch (err) {
-    res.status(500).json({ code: 'SERVER_ERROR' });
-  }
-};
-
 exports.getClassify = async (req, res) => {
   try {
     const { label } = req.params;
