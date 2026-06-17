@@ -1,7 +1,7 @@
 // Form login di halaman auth
 
 import { useState } from 'react';
-import api from '../api/axios';
+import { api } from '../api/axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { gameToast } from './gameToast';
 import { Eye, EyeOff } from 'lucide-react';
@@ -33,6 +33,19 @@ export default function LoginForm() {
     }
 
     setLoading(true);
+
+    // cek admin duluan daripada user biasa
+    try {
+      const admin = await api.post('/auth/admin-login', { 
+        identifier, password 
+      });
+      if (admin.data.adminToken) {
+        localStorage.setItem('adminToken', admin.data.adminToken);
+        navigate('/admin');
+        return;
+      }
+    } catch (adminErr) {
+    }
 
     try {
       const res = await api.post('/auth/login', {
@@ -81,7 +94,7 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} noValidate>
       <input
-        type="email"
+        type="text"
         className="form-control mb-3"
         placeholder="Email/username"
         value={identifier}

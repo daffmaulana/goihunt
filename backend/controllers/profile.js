@@ -82,7 +82,7 @@ exports.updateProfile = async (req, res) => {
        SET username = COALESCE($1, username),
            avatar_key = COALESCE($2, avatar_key)
        WHERE id = $3`,
-      [username, profileImage, userId]
+      [username, profileImage ? `/avatars/${profileImage}.svg` : null, userId]
     );
 
     res.json({ code:'PROFILE_UPDATED', message: 'Profil diperbarui' });

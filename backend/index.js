@@ -16,8 +16,8 @@ const globalLimiter = rateLimit({
 });
 
 app.use(cors({origin: 
-  process.env.FRONTEND_URL,
-  // 'https://192.168.1.7:5173', 
+  // process.env.FRONTEND_URL,
+  'https://192.168.1.7:5173', 
   // 'https://172.25.20.82:5173', 
   credentials: true}));
 app.use(express.json());
@@ -33,6 +33,7 @@ app.use('/mission', authMiddleware, require('./routes/mission.js'));
 app.use('/collection', authMiddleware, require('./routes/collection.js'));
 app.use('/quiz', authMiddleware, require('./routes/quiz.js'));
 app.use('/classify', authMiddleware, require('./routes/classify.js'));
+app.use('/api/admin', authMiddleware, require('./routes/admin'));
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

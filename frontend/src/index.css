@@ -219,10 +219,6 @@ html, body {
   border-radius: 10px;
 }
 
-.btn-primary:hover {
-  background-color: #e0a000 !important;
-}
-
 .btn-outline-primary {
   background-color: transparent !important;
   color: #FCB001 !important;
@@ -231,10 +227,6 @@ html, body {
   border-radius: 10px;
 }
 
-.btn-outline-primary:hover {
-  background-color: #FCB001 !important;
-  color: black !important;
-}
 
 .xp-bar-modern {
   height: 24px;

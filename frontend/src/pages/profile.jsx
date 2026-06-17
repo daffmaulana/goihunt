@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import api from '../api/axios';
+import { api } from '../api/axios';
 import { gameToast } from '../components/gameToast';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Lock, KeyRound, LogOut, Eye, EyeOff } from 'lucide-react';
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const AVATARS = ['bear', 'cat', 'cow', 'dog', 'panda', 'rabbit', 'tiger', 'whale','worm','penguin'];
 
@@ -46,7 +46,9 @@ export default function profile() {
       .then(res => {
         setProfile(res.data);
         setUsername(res.data.username);
-        setAvatarKey(res.data.avatar_key);
+        // avatar_key is stored as full path e.g. /avatars/bear.svg — extract the stem for the picker
+        const key = res.data.avatar_key?.replace('/avatars/', '').replace('.svg', '') || 'bear';
+        setAvatarKey(key);
       })
       .catch(() => alert('Unauthorized'));
   }, []);
@@ -66,7 +68,7 @@ export default function profile() {
       payload.username = username
     }
 
-    if (avatarKey !== profile.avatar_key) {
+    if (avatarKey !== profile.avatar_key?.replace('/avatars/', '').replace('.svg', '')) {
       payload.profileImage = avatarKey;
     }
 
@@ -88,7 +90,7 @@ export default function profile() {
         onClose: () => setProfileLoading(false)
       });
 
-      setProfile({ ...profile, ...payload, avatar_key: avatarKey });
+      setProfile({ ...profile, ...payload, avatar_key: `/avatars/${avatarKey}.svg` });
 
     } catch (err) {
       if (err.response) {
@@ -245,7 +247,7 @@ export default function profile() {
             <div className="text-center mb-4">
               <div className="position-relative d-inline-block rounded-circle shadow-sm border p-1">
                 <img
-                  src={`/avatars/${avatarKey || 'bear'}.svg`}
+                  src={avatarKey ? `/avatars/${avatarKey}.svg` : '/avatars/bear.svg'}
                   alt="Avatar"
                   width={100}
                   height={100}

@@ -2,7 +2,7 @@
 
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useContext } from 'react';
-import api from '../api/axios';
+import { api } from '../api/axios';
 import { gameToast } from '../components/gameToast';
 import { PackageSearch, GamepadDirectional } from 'lucide-react';
 import { UserContext } from '../components/userContext';
@@ -37,7 +37,7 @@ export default function Wrapper() {
                 width='50'
                 height='50'
                 className='p-1' 
-                src={`/avatars/${user.avatar_key}.svg`} 
+                src={user.avatar_key} 
                 alt="avatar" 
                 draggable='false'
                 onContextMenu={(e) => e.preventDefault()}

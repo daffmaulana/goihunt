@@ -1,7 +1,7 @@
 // Form registrasi di halaman auth
 
 import { useState } from 'react';
-import api from '../api/axios';
+import { api } from '../api/axios';
 import { gameToast } from "../components/gameToast";
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';

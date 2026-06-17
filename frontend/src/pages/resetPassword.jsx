@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import api from '../api/axios';
+import { api } from '../api/axios';
 import { gameToast } from '../components/gameToast';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 

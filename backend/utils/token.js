@@ -17,3 +17,9 @@ exports.generateResetToken = () => {
 exports.hashToken = (token) => {
   return crypto.createHash('sha256').update(token).digest('hex');
 };
+
+exports.generateAdminToken = () => {return jwt.sign(
+  { role: 'admin' },  
+  process.env.JWT_SECRET,
+  { expiresIn: '60m' }
+  );};

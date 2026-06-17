@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 
 const loginLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 3,
+  max: 5,
   message: {
     message: 'Terlalu banyak percobaan login, coba lagi dalam 1 menit'
   }
@@ -31,6 +31,7 @@ router.post('/register', registerLimiter, authController.register);
 router.post('/login', loginLimiter, authController.login);
 router.post('/logout', authController.logout);
 router.post('/forgot-password', forgotLimiter, authController.forgotPassword);
-router.post('/reset-password', authController.resetPassword);   
+router.post('/reset-password', authController.resetPassword);
+router.post('/admin-login', loginLimiter, authController.adminLogin);
 
 module.exports = router;

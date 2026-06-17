@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState, useContext, useTransition } f
 import * as tf from "@tensorflow/tfjs";
 import { gameToast } from "../components/gameToast";
 import { X, Library, ImageIcon, PackagePlus, PackageX, CameraOff, AlertCircle, CheckCircle2, Loader } from "lucide-react";
-import api from "../api/axios";
+import { api } from '../api/axios';
 import { UserContext } from '../components/userContext';
 import { motion, AnimatePresence } from "framer-motion";
 import '@tensorflow/tfjs-backend-wasm';
@@ -27,6 +27,7 @@ export default function Klasifikasi() {
   const [labelCandidates, setLabelCandidates] = useState([]);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [answerResult, setAnswerResult] = useState(null);
+  const [shuffledOptions, setShuffledOptions] = useState([]);
   const [cameraError, setCameraError] = useState(null);
   const [confidenceRate, setConfidenceRate] = useState(null);
   const [isModelLoading, setIsModelLoading] = useState(true);
@@ -185,6 +186,10 @@ export default function Klasifikasi() {
     try {
       const res = await api.get(`/quiz/${vocabId}`);
       setQuiz(res.data);
+      const opts = ['A', 'B', 'C', 'D']
+        .map((letter) => ({ letter, text: res.data[`option_${letter.toLowerCase()}`] }))
+        .sort(() => Math.random() - 0.5);
+      setShuffledOptions(opts);
       setShowQuiz(true);
     } catch (err) {
       console.error("Error load quiz:", err);
@@ -224,6 +229,7 @@ export default function Klasifikasi() {
         setQuiz(null);
         setSelectedAnswer(null);
         setAnswerResult(null);
+        setShuffledOptions([]);
         
         setTimeout(() => {
           setShowVocab(true); 
@@ -779,14 +785,14 @@ export default function Klasifikasi() {
                   <h4 className="fw-bold mb-0">{quiz.question}</h4>
                 </div>
                 <div className="d-flex flex-column gap-3 ">
-                  {["A", "B", "C", "D"].map((opt) => (
+                  {shuffledOptions.map(({ letter, text }) => (
                     <button
-                      key={opt}
+                      key={letter}
                       disabled={selectedAnswer !== null}
-                      onClick={() => handleAnswer(opt)}
+                      onClick={() => handleAnswer(letter)}
                       className={`btn rounded-4 rounded
                       ${
-                        selectedAnswer === opt
+                        selectedAnswer === letter
                           ? answerResult === true
                             ? "bg-success text-white"
                             : answerResult === false
@@ -796,7 +802,7 @@ export default function Klasifikasi() {
                       }
                     `}
                     >
-                      {quiz[`option_${opt.toLowerCase()}`]}
+                      {text}
                     </button>
                   ))}
                 </div>

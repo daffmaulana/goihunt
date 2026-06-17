@@ -1,9 +1,9 @@
 // /api/auth
 // UNTUK NGATUR LOGIC AUTENTIKASI. MULAI DARI LOGIN, REGISTER, ACCESS TOKEN (JWT), REFRESH TOKEN (EXPIRED-IN JWT), FORGOT PASSWORD (SEND RESET EMAIL), DAN RESET PASSWORD (UBAH PASSWORD DARI RESET EMAIL).
-
+require('dotenv').config();
 const bcrypt = require('bcrypt');
 const pool = require('../db');
-const { generateAccessToken, generateResetToken, hashToken } = require('../utils/token');
+const { generateAccessToken, generateResetToken, hashToken, generateAdminToken } = require('../utils/token');
 const { sendResetPasswordEmail } = require('../utils/mailer');
 const { checkAchievements } = require('../utils/achievement');
 
@@ -255,5 +255,25 @@ exports.resetPassword = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ code:'SERVER_ERROR', message: 'Terjadi kesalahan pada server, coba lagi' });
+  }
+};
+
+exports.adminLogin = async (req, res) => {
+  try {
+    const { identifier, password } = req.body;
+
+    if (
+      identifier === process.env.ADMIN_USERNAME &&
+      password === process.env.ADMIN_PASSWORD
+    ) {
+      const adminToken = generateAdminToken();
+      return res.json({ adminToken });
+    }
+
+    return res.status(401).json({message:'Username/Password Admin Salah'});
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ code: 'SERVER_ERROR', message: 'Terjadi kesalahan pada server, coba lagi' });
   }
 };

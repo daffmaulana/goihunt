@@ -1,7 +1,7 @@
 // /gamifikasi
 
 import { useEffect, useState } from 'react';
-import api from '../api/axios';
+import { api } from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { Camera, Medal, Goal, Trophy} from 'lucide-react';
 import { UserContext } from '../components/userContext';
@@ -112,7 +112,7 @@ export default function Gamifikasi() {
 
                   <div className='d-inline-block rounded-circle p-1 border shadow-sm'>
                     <img
-                      src={`/avatars/${user.avatar_key}.svg`}
+                      src={user.avatar_key}
                       width="60" height="60"
                       className="p-1"
                       alt="avatar"
@@ -232,7 +232,7 @@ export default function Gamifikasi() {
                 <div key={a.code} className="text-center" style={{ width: '86px' }}>
                   <div className="position-relative">
                     <img
-                      src={`/badges/${a.icon}.svg`}
+                      src={a.icon}
                       width="60"
                       height="60"
                       className="mb-1"
