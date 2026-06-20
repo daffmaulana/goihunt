@@ -112,7 +112,7 @@ export default function Leaderboard() {
                     <p className="m-0 fw-bold text-truncate">
                       {isMe ? `${user.username} (Aku)` : user.username}
                     </p>
-                    <p className="text-muted small m-0">Lv. {user.level}</p>
+                    <p className="text-muted small m-0">Tk. {user.level}</p>
                   </div>
 
                   <div className="flex-shrink-0 ms-2 text-end">

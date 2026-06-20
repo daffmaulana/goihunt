@@ -31,7 +31,6 @@ router.post('/register', registerLimiter, authController.register);
 router.post('/login', loginLimiter, authController.login);
 router.post('/logout', authController.logout);
 router.post('/forgot-password', forgotLimiter, authController.forgotPassword);
-router.post('/reset-password', authController.resetPassword);
 router.post('/admin-login', loginLimiter, authController.adminLogin);
 
 module.exports = router;

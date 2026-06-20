@@ -60,9 +60,9 @@ export default function Wrapper() {
                     <div className="xp-fill-modern" style={{ width: `${progress}%` }}
                     />
                     <div className="xp-content d-flex justify-content-between align-items-center px-2">
-                      <span className="level-badge">Lv. {user.level}</span>
+                      <span className="level-badge">Tk. {user.level}</span>
                       <span className="xp-text">{user.xp_current}/{user.xp_next} P</span>
-                      <span className="level-badge text-end">Lv. {user.level + 1}</span>
+                      <span className="level-badge text-end">Tk. {user.level + 1}</span>
                     </div>
                   </div>
                 </div>

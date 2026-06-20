@@ -840,6 +840,7 @@ export default function Klasifikasi() {
                   <div>Waktu: {processingTime.toFixed(0)}ms</div>
                 )}
               </div>
+
               <div className='justify-content-between align-items-center p-4'>
                 <div className="bg-white rounded-4 d-flex align-items-center justify-content-between p-3 text-center">
                   <div style={{ width: '32px' }}></div>
@@ -847,19 +848,15 @@ export default function Klasifikasi() {
                     <small className="text-muted">{vocabDetail.furigana}</small>
                     <h2 className="fw-bold m-0">{vocabDetail.kanji}</h2>
                     <small className="text-muted">{vocabDetail.romaji}</small>
-
-                    
                   </div>
-
-
-                  
 
                   <button
                     onClick={toggleCollection}
-                    className={`btn p-0 border-0 ${isCollected ? 'text-danger' : 'text-success'}`}
-                    style={{ width: '32px' }}
+                    className={`btn p-0 border-0 d-flex flex-column align-items-center ${isCollected ? 'text-danger' : 'text-success'}`}
+                    style={{ width: '40px', fontSize: '10px' }}
                   >
                     {isCollected ? <PackageX size={28} /> : <PackagePlus size={28} />}
+                    <span>{isCollected ? 'Hapus' : 'Koleksi'}</span>
                   </button>
                 </div>  
               </div>

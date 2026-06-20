@@ -1,10 +1,10 @@
 // /api/auth
-// UNTUK NGATUR LOGIC AUTENTIKASI. MULAI DARI LOGIN, REGISTER, ACCESS TOKEN (JWT), REFRESH TOKEN (EXPIRED-IN JWT), FORGOT PASSWORD (SEND RESET EMAIL), DAN RESET PASSWORD (UBAH PASSWORD DARI RESET EMAIL).
+// UNTUK NGATUR LOGIC AUTENTIKASI. MULAI DARI LOGIN, REGISTER, ACCESS TOKEN (JWT), FORGOT PASSWORD (RESET LANGSUNG KE PASS ACAK).
 require('dotenv').config();
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const pool = require('../db');
-const { generateAccessToken, generateResetToken, hashToken, generateAdminToken } = require('../utils/token');
-const { sendResetPasswordEmail } = require('../utils/mailer');
+const { generateAccessToken, generateAdminToken } = require('../utils/token');
 const { checkAchievements } = require('../utils/achievement');
 
 const usernameRegex = /^[a-z0-9_]{3,20}$/;
@@ -62,7 +62,7 @@ exports.register = async (req, res) => {
 
     const AVATARS = ['bear', 'cat', 'cow', 'dog', 'panda', 'rabbit', 'tiger', 'whale','worm','penguin'];
 
-    const avatar_key = AVATARS[Math.floor(Math.random() * AVATARS.length)];
+    const avatar_key = `/avatars/${AVATARS[Math.floor(Math.random() * AVATARS.length)]}.png`;
 
     const newUser = await pool.query(
       `INSERT INTO users (username, email, password, avatar_key)
@@ -153,90 +153,33 @@ exports.forgotPassword = async (req, res) => {
     let { email } = req.body;
 
     if (!email) {
-      return res.json({ code:'RESET_PASSWORD_SENT', message: 'Jika email terdaftar, link reset akan dikirim' });
+      return res.status(400).json({ code: 'FIELD_MISSING', message: 'Email wajib diisi' });
     }
 
     email = email.toLowerCase().trim();
 
     if (!emailRegex.test(email)) {
-      return res.status(400).json({  code:'INVALID_EMAIL',  message: 'Format email tidak valid' });
+      return res.status(400).json({ code: 'INVALID_EMAIL', message: 'Format email tidak valid' });
     }
 
     const userQuery = await pool.query(
-      'SELECT id, username FROM users WHERE email = $1',
+      'SELECT id FROM users WHERE email = $1',
       [email]
     );
 
     if (userQuery.rows.length === 0) {
-      return res.json({ code:'RESET_PASSWORD_SENT', message: 'Jika email terdaftar, link reset akan dikirim' });
+      return res.json({ code: 'RESET_DONE', message: 'Jika email terdaftar, password telah direset' });
     }
 
-    const user = userQuery.rows[0];
+    const userId = userQuery.rows[0].id;
 
-    const userId = user.id;
-    const username = user.username;
-
-    await pool.query(
-      'DELETE FROM password_resets WHERE user_id = $1',
-      [userId]
-    );
-
-    const resetToken = generateResetToken();
-    const hashedToken = hashToken(resetToken);
-
-    const expiresAt = new Date();
-    expiresAt.setMinutes(expiresAt.getMinutes() + 30); // 30 menit
-
-    await pool.query(
-      `INSERT INTO password_resets (user_id, token, expires_at)
-       VALUES ($1, $2, $3)`,
-      [userId, hashedToken, expiresAt]
-    );
-
-    await sendResetPasswordEmail(email, username, resetToken);
-
-    return res.json({ code:'RESET_PASSWORD_SENT', message: 'Jika email terdaftar, link reset akan dikirim' });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ code:'SERVER_ERROR', message: 'Terjadi kesalahan pada server, coba lagi' });
-  }
-};
-
-exports.resetPassword = async (req, res) => {
-  try {
-    const { token, newPassword, confirmPassword } = req.body;
-
-    if (!token || !newPassword || !confirmPassword) {
-      return res.status(400).json({ code: 'FIELD_MISSING', message: 'Data tidak lengkap' });
+    // Generate password acak 8 karakter (huruf + angka)
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz0123456789';
+    let newPassword = '';
+    const randomBytes = crypto.randomBytes(8);
+    for (let i = 0; i < 8; i++) {
+      newPassword += chars[randomBytes[i] % chars.length];
     }
-
-    if (newPassword !== confirmPassword) {
-      return res.status(400).json({ code: 'PASSWORD_MISMATCH', message: 'Konfirmasi password tidak cocok'});
-    }
-
-    if (newPassword.length < 8) {
-      return res.status(400).json({ code: 'WEAK_PASSWORD', message: 'Password minimal 8 karakter' });
-    }
-
-    if (!passwordRegex.test(newPassword)) {
-      return res.status(400).json({ code: 'WEAK_PASSWORD', message: 'Password harus mengandung huruf dan angka' });
-    }
-
-    const hashedToken = hashToken(token);
-
-    const resetQuery = await pool.query(
-      `SELECT pr.user_id
-       FROM password_resets pr
-       WHERE pr.token = $1 AND pr.expires_at > NOW()`,
-      [hashedToken]
-    );
-
-    if (resetQuery.rows.length === 0) {
-      return res.status(400).json({ code: 'INVALID_TOKEN', message: 'Token reset tidak valid atau sudah expired' });
-    }
-
-    const userId = resetQuery.rows[0].user_id;
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
@@ -245,16 +188,15 @@ exports.resetPassword = async (req, res) => {
       [hashedPassword, userId]
     );
 
-    await pool.query(
-      'DELETE FROM password_resets WHERE user_id = $1',
-      [userId]
-    );
-
-    res.json({ code:'PASSWORD_UPDATED', message: 'Password diubah dan silahkan login ulang' });
+    return res.json({
+      code: 'RESET_DONE',
+      message: 'Password berhasil direset',
+      newPassword
+    });
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ code:'SERVER_ERROR', message: 'Terjadi kesalahan pada server, coba lagi' });
+    res.status(500).json({ code: 'SERVER_ERROR', message: 'Terjadi kesalahan pada server, coba lagi' });
   }
 };
 
