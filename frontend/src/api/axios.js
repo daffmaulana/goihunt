@@ -9,6 +9,7 @@ const createApiInstance = (tokenType = 'accessToken') => {
     withCredentials: true
   });
 
+  
   instance.interceptors.request.use(config => {
     const token = localStorage.getItem(tokenType);
     if (token) {
