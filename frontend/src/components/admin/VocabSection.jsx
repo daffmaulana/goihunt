@@ -24,7 +24,7 @@ const VocabSection = () => {
   useEffect(() => {
     const fetchVocab = async () => {
       try {
-        const res = await adminApi.get('/api/admin/vocab');
+        const res = await adminApi.get('/admin/vocab');
         setRows(res.data);
       } catch (err) {
         gameToast.error(err.response?.data?.message);
@@ -37,7 +37,7 @@ const VocabSection = () => {
 
   const handleSave = async (id, updatedRow) => {
     try {
-      const res = await adminApi.put(`/api/admin/vocab/${id}`, updatedRow);
+      const res = await adminApi.put(`/admin/vocab/${id}`, updatedRow);
       const saved = res.data?.data ?? updatedRow;
       setRows((prev) =>
         prev.map((row) => (row.id === id ? { ...row, ...saved } : row))

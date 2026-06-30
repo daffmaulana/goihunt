@@ -25,8 +25,8 @@ const QuizSection = () => {
     const fetchData = async () => {
       try {
         const [quizRes, vocabRes] = await Promise.all([
-          adminApi.get('/api/admin/quiz'),
-          adminApi.get('/api/admin/vocab'),
+          adminApi.get('/admin/quiz'),
+          adminApi.get('/admin/vocab'),
         ]);
         setRows(quizRes.data.data ?? quizRes.data);
         setVocabs(vocabRes.data);
@@ -43,7 +43,7 @@ const QuizSection = () => {
     { key: 'id', label: 'ID', readOnly: true },
     {
       key: 'vocab_id',
-      label: 'Vocab ID',
+      label: 'ID Kosakata',
       type: 'select',
       options: vocabs.map((v) => ({
         value: v.id,
@@ -60,7 +60,7 @@ const QuizSection = () => {
 
   const handleSave = async (id, updatedRow) => {
     try {
-      const res = await adminApi.put(`/api/admin/quiz/${id}`, updatedRow);
+      const res = await adminApi.put(`/admin/quiz/${id}`, updatedRow);
       const saved = res.data.data ?? updatedRow;
       setRows((prev) =>
         prev.map((row) => (row.id === id ? { ...row, ...saved } : row))
@@ -73,7 +73,7 @@ const QuizSection = () => {
 
   const handleAdd = async (newRow) => {
     try {
-      const res = await adminApi.post('/api/admin/quiz', newRow);
+      const res = await adminApi.post('/admin/quiz', newRow);
       const created = res.data.data ?? newRow;
       setRows((prev) => [...prev, created]);
       gameToast.success(res.data.message);
@@ -93,7 +93,7 @@ const QuizSection = () => {
     setPendingDeleteId(null);
 
     try {
-      const res = await adminApi.delete(`/api/admin/quiz/${id}`);
+      const res = await adminApi.delete(`/admin/quiz/${id}`);
       setRows((prev) => prev.filter((row) => row.id !== id));
       gameToast.success(res.data.message);
     } catch (err) {

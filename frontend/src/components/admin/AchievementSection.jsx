@@ -21,7 +21,7 @@ const AchievementSection = () => {
   useEffect(() => {
     const fetchAchievements = async () => {
       try {
-        const res = await adminApi.get('/api/admin/achievements');
+        const res = await adminApi.get('/admin/achievements');
         setRows(res.data);
       } catch (err) {
         gameToast.error(err.response?.data?.message);
@@ -34,7 +34,7 @@ const AchievementSection = () => {
 
   const handleSave = async (id, updatedRow) => {
     try {
-      const res = await adminApi.put(`/api/admin/achievements/${id}`, updatedRow);
+      const res = await adminApi.put(`/admin/achievements/${id}`, updatedRow);
       const saved = res.data?.data ?? updatedRow;
       setRows((prev) =>
         prev.map((row) => (row.id === id ? { ...row, ...saved } : row))

@@ -5,11 +5,11 @@ import VocabSection from '../components/admin/VocabSection';
 import AchievementSection from '../components/admin/AchievementSection';
 import UserSection from '../components/admin/UserSection';
 
-const TABS = ['Quiz', 'Vocabulary', 'Achievement', 'User'];
+const TABS = ['Kuis', 'Kosakata', 'Pencapaian', 'Pengguna'];
 
 const AdminPage = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('Quiz');
+  const [activeTab, setActiveTab] = useState('Kuis');
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
@@ -47,10 +47,10 @@ const AdminPage = () => {
       </ul>
       
       <div style={{padding: '2rem', background: '#fff', minHeight: '400px'}}>
-        {activeTab === 'Quiz'        && <QuizSection />}
-        {activeTab === 'Vocabulary'  && <VocabSection />}
-        {activeTab === 'Achievement' && <AchievementSection />}
-        {activeTab === 'User'        && <UserSection />}
+        {activeTab === 'Kuis'        && <QuizSection />}
+        {activeTab === 'Kosakata'  && <VocabSection />}
+        {activeTab === 'Pencapaian' && <AchievementSection />}
+        {activeTab === 'Pengguna'        && <UserSection />}
       </div>
     </div>
   </div>

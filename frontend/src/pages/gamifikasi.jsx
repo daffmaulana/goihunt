@@ -180,7 +180,7 @@ export default function Gamifikasi() {
                 Cari {mission?.target_item && mission.target_item.charAt(0).toUpperCase() + mission.target_item.slice(1)}
               </h6>
 
-              <p className="text-muted m-0 small">+20 P</p>
+              <p className="text-muted m-0 small">+10 P</p>
             </div>
 
             <div className="fw-bold small text-muted">

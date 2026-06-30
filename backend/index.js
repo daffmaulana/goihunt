@@ -33,7 +33,7 @@ app.use('/mission', authMiddleware, require('./routes/mission.js'));
 app.use('/collection', authMiddleware, require('./routes/collection.js'));
 app.use('/quiz', authMiddleware, require('./routes/quiz.js'));
 app.use('/classify', authMiddleware, require('./routes/classify.js'));
-app.use('/api/admin', authMiddleware, require('./routes/admin'));
+app.use('/admin', authMiddleware, require('./routes/admin'));
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

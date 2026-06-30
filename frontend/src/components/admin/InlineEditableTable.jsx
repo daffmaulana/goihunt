@@ -166,7 +166,7 @@ const InlineEditableTable = ({
                         className="btn btn-primary btn-sm"
                         onClick={() => handleSave(row.id)}
                       >
-                        Save
+                        Simpan
                       </button>
                     )}
                     {onDelete && (
@@ -175,7 +175,7 @@ const InlineEditableTable = ({
                         className="btn btn-danger btn-sm"
                         onClick={() => onDelete(row.id)}
                       >
-                        Delete
+                        Hapus
                       </button>
                     )}
                   </div>
@@ -199,7 +199,7 @@ const InlineEditableTable = ({
                       }
                       aria-label={`New ${col.label}`}
                     >
-                      <option value="">— select —</option>
+                      <option value="">— pilih —</option>
                       {col.options?.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                           {opt.label}
@@ -246,7 +246,7 @@ const InlineEditableTable = ({
                   className="btn btn-success btn-sm"
                   onClick={handleAdd}
                 >
-                  Add
+                  Tambah
                 </button>
               </td>
             </tr>

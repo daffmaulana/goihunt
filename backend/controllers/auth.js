@@ -62,7 +62,7 @@ exports.register = async (req, res) => {
 
     const AVATARS = ['bear', 'cat', 'cow', 'dog', 'panda', 'rabbit', 'tiger', 'whale','worm','penguin'];
 
-    const avatar_key = `/avatars/${AVATARS[Math.floor(Math.random() * AVATARS.length)]}.png`;
+    const avatar_key = `/avatars/${AVATARS[Math.floor(Math.random() * AVATARS.length)]}.svg`;
 
     const newUser = await pool.query(
       `INSERT INTO users (username, email, password, avatar_key)

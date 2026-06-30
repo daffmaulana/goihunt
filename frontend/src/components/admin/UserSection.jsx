@@ -29,7 +29,7 @@ const UserSection = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await adminApi.get('/api/admin/users');
+        const res = await adminApi.get('/admin/users');
         setRows(res.data.data ?? res.data);
       } catch (err) {
         gameToast.error(err.response?.data?.message);
@@ -51,7 +51,7 @@ const UserSection = () => {
     setPendingDeleteId(null);
 
     try {
-      const res = await adminApi.delete(`/api/admin/users/${id}`);
+      const res = await adminApi.delete(`/admin/users/${id}`);
       setRows((prev) => prev.filter((row) => row.id !== id));
       gameToast.success(res.data.message);
     } catch (err) {

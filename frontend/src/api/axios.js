@@ -6,7 +6,6 @@ const createApiInstance = (tokenType = 'accessToken') => {
     baseURL: 
   import.meta.env.VITE_API_URL,
   // 'http://192.168.1.11:3000',
-  // 'http://172.25.20.82:3000',
     withCredentials: true
   });
 

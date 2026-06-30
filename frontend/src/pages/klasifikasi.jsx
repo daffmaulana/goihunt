@@ -84,9 +84,6 @@ export default function Klasifikasi() {
         setWasmPaths('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm/dist/');
         await tf.setBackend("wasm");
         await tf.ready();
-        // tf.env().set('WEBGL_FORCE_F16_TEXTURES', false); 
-        // tf.env().set('WEBGL_PACK', true);
-        // tf.env().set('WEBGL_FLUSH_THRESHOLD', -1);
 
         console.log("Backend:", tf.getBackend());
 
