@@ -303,16 +303,14 @@ export default function Klasifikasi() {
 
   // open label confidence rendah
   const openLabelPicker = useCallback((candidates) => {
-    const filteredCandidates = candidates.filter(c => c.label !== "random");
-    
-    if (filteredCandidates.length === 0) {
+    if (candidates.length === 0) {
       gameToast.error("Objek belum tersedia di sistem");
       setPreviewMode(true);
       return false;
     }
     
     startTransition(() => {
-      setLabelCandidates(filteredCandidates); 
+      setLabelCandidates(candidates); 
       setShowLabelPicker(true);
     });
     
@@ -381,15 +379,22 @@ export default function Klasifikasi() {
         percentage: (best.confidence * 100).toFixed(2) + "%"
       });
 
-      if (best.label === "random") {
+      const UNKNOWN_THRESHOLD = 0.70;
+      const PICKER_THRESHOLD = 0.90;
+      
+      // confidence < 70% → Tolak || 0 - 69.49
+      // 70% ≤ confidence < 90% → Label Picker || 69.5 - 89.49
+      // confidence ≥ 90% → Terima || 89.5 - 100
+
+      if (best.confidence < UNKNOWN_THRESHOLD) {
         gameToast.error("Maaf, objek terdeteksi tidak dikenal");
         setPreviewMode(false);
         setIsLoading(false);
         return;
       }
-      
-      const needsPicker = best.confidence < 0.7;
-      console.log("butuh picker?", needsPicker, "(confidence < 0.7)");
+
+      const needsPicker = best.confidence < PICKER_THRESHOLD;
+      console.log("butuh picker?", needsPicker, `(confidence ${(best.confidence * 100).toFixed(1)}% < ${PICKER_THRESHOLD * 100}%)`);
 
       if (needsPicker) {
         console.log("confidence terlalu rendah, buka picker");

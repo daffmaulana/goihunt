@@ -5,7 +5,6 @@ kacamata
 kursi
 laptop
 meja
-random
 sepatu
 tas
 topi

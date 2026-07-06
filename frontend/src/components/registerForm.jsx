@@ -60,14 +60,16 @@ export default function RegisterForm() {
     setLoading(true);
 
     try {
-      await api.post('/auth/register', {
+      const res = await api.post('/auth/register', {
         username,
         email,
         password,
         confirmPassword
       });
 
-      gameToast.success('Akun berhasil dibuat, silahkan login', {
+      localStorage.setItem('accessToken', res.data.accessToken);
+
+      gameToast.success('Akun berhasil dibuat', {
         onClose: () => navigate('/')
       });
 

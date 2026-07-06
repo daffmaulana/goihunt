@@ -17,7 +17,7 @@ const globalLimiter = rateLimit({
 
 app.use(cors({origin: 
   process.env.FRONTEND_URL,
-  // 'https://192.168.1.11:5173', 
+  // 'https://192.168.1.9:5173', 
   // 'https://172.25.20.82:5173', 
   credentials: true}));
 app.use(express.json());

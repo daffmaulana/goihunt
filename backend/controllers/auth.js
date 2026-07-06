@@ -71,7 +71,17 @@ exports.register = async (req, res) => {
       [username, email, hashedPassword, avatar_key]
     );
 
-    res.status(201).json(newUser.rows[0]);
+    const user = newUser.rows[0];
+    const accessToken = generateAccessToken(user);
+
+    res.status(201).json({
+      accessToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username
+      }
+    });
 
   } catch (err) {
     console.error(err);
