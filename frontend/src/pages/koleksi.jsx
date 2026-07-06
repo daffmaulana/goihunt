@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api/axios';
-import { ArrowLeft, ChevronLeft, ChevronRight, PackageX, X } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, PackageX, Star, X } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 import { gameToast } from '../components/gameToast';
@@ -40,6 +40,7 @@ import { gameToast } from '../components/gameToast';
 export default function Koleksi() {
   const [collections, setCollections] = useState([]);
   const [selected, setSelected] = useState(null);
+  const [filter, setFilter] = useState('all'); // 'all' | 'mastered' | 'unmastered'
 
   const navigate = useNavigate();
 
@@ -50,11 +51,7 @@ export default function Koleksi() {
   const fetchCollections = async () => {
     try {
       const res = await api.get('/collection');
-      const mapped = res.data.map((item) => ({
-        ...item
-      }));
-
-      setCollections(mapped);
+      setCollections(res.data);
     } catch (err) {
       console.log('error collection');
     }
@@ -109,6 +106,13 @@ export default function Koleksi() {
     }
   };
 
+  const masteredCount = collections.filter(c => c.mastered_at).length;
+  const filteredCollections = collections.filter(c => {
+    if (filter === 'mastered') return !!c.mastered_at;
+    if (filter === 'unmastered') return !c.mastered_at;
+    return true;
+  });
+
  return (
   <div className="auth-page d-flex flex-column px-4 py-5">
   
@@ -130,25 +134,71 @@ export default function Koleksi() {
     transition={{ duration: 0.3 }}
     >
     
-      <h3 className="fw-bold mb-4">Koleksi</h3>
+      <h3 className="fw-bold mb-3">Koleksi</h3>
+
+      {/* STAT DIKUASAI */}
+      {collections.length > 0 && (
+        <div className="d-flex align-items-center gap-2 mb-3">
+          <Star size={16} className="text-warning" fill="currentColor" />
+          <small className="fw-semibold text-muted">
+            Dikuasai: <span className="text-dark">{masteredCount}</span> / {collections.length} vocab
+          </small>
+        </div>
+      )}
+
+      {/* FILTER */}
+      {collections.length > 0 && (
+        <div className="d-flex gap-2 mb-3">
+          {[
+            { key: 'all', label: 'Semua' },
+            { key: 'mastered', label: '⭐ Dikuasai' },
+            { key: 'unmastered', label: 'Belum Dikuasai' },
+          ].map(f => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className={`btn btn-sm rounded-pill px-3 ${filter === f.key ? 'btn-primary' : 'btn-outline-secondary'}`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="glass-container rounded-4 p-3 mb-5">
         <motion.div 
-          key={collections.length}
+          key={`${collections.length}-${filter}`}
           variants={containerStagger}
           initial="hidden"
           animate="visible"
-          className={`d-flex flex-wrap justify-content-center gap-2 ${collections.length === 0 ? 'py-4' : ''}`}
+          className={`d-flex flex-wrap justify-content-center gap-2 ${filteredCollections.length === 0 ? 'py-4' : ''}`}
         >
-          {collections.length > 0 ? (
-            collections.map((item) => (
+          {collections.length === 0 ? (
+            <div className="text-center py-3 text-muted fw-bold">
+              Kamu belum ada koleksi, ayo cari objek!
+            </div>
+          ) : filteredCollections.length === 0 ? (
+            <div className="text-center py-3 text-muted fw-bold">
+              Tidak ada vocab di kategori ini.
+            </div>
+          ) : (
+            filteredCollections.map((item) => (
               <motion.div
                 key={item.id}
                 variants={cardItemVariants}
                 onClick={() => setSelected(item)}
-                className="glass-card-item text-center rounded-4 p-2"
-                style={{ width: '110px', cursor: 'pointer' }}
+                className="glass-card-item text-center rounded-4 p-2 position-relative"
+                style={{ width: '110px', cursor: 'pointer', opacity: item.mastered_at ? 1 : 0.65 }}
               >
+                {item.mastered_at && (
+                  <div
+                    className="position-absolute top-0 end-0 m-1"
+                    style={{ lineHeight: 1 }}
+                    title="Dikuasai"
+                  >
+                    <Star size={16} className="text-warning" fill="currentColor" />
+                  </div>
+                )}
                 <div className="mb-2">
                   <img
                     src={item.image_url}
@@ -165,10 +215,6 @@ export default function Koleksi() {
                 </p>
               </motion.div>
             ))
-          ) : (
-            <div className="text-center py-3 text-muted fw-bold">
-              Kamu belum ada koleksi, ayo cari objek!
-            </div>
           )}
         </motion.div>
       </div>
@@ -207,6 +253,19 @@ export default function Koleksi() {
                     <small className="text-muted">{selected.furigana}</small>
                     <h2 className="fw-bold m-0">{selected.kanji}</h2>
                     <small className="text-muted">{selected.romaji}</small>
+                    {selected.mastered_at ? (
+                      <div className="mt-1">
+                        <span className="badge rounded-pill text-bg-warning d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem' }}>
+                          <Star size={11} fill="currentColor" /> Dikuasai
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="mt-1">
+                        <span className="badge rounded-pill text-bg-secondary d-inline-flex align-items-center gap-1" style={{ fontSize: '0.7rem', opacity: 0.7 }}>
+                          Belum dikuasai
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <button

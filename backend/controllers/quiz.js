@@ -55,6 +55,14 @@ if (!alreadyCorrect) {
       [userId, vocabId, quizId]
     );
 
+    // Tandai vocab sebagai "dikuasai" di koleksi jika ada
+    // (tidak peduli soal yang mana, cukup pernah jawab benar vocab ini)
+    await pool.query(
+      `UPDATE user_collections SET mastered_at = NOW()
+       WHERE user_id = $1 AND vocab_id = $2 AND mastered_at IS NULL`,
+      [userId, vocabId]
+    );
+
   } else {
     xpChange = xpRules.QUIZ_INCORRECT;
     await addXpToUser(userId, 'QUIZ_INCORRECT');

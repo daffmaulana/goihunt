@@ -19,6 +19,21 @@ exports.addCollection = async (req, res) => {
 
     if (result.rows.length > 0) {
       await incrementAchievementProgress(userId, 'VOCAB');
+
+      // Cek apakah user sudah pernah jawab benar kuis vocab ini
+      // Kalau sudah, langsung tandai sebagai dikuasai
+      const alreadyAnswered = await pool.query(
+        'SELECT id FROM user_quiz WHERE user_id = $1 AND vocab_id = $2 LIMIT 1',
+        [userId, vocabId]
+      );
+
+      if (alreadyAnswered.rows.length > 0) {
+        await pool.query(
+          `UPDATE user_collections SET mastered_at = NOW()
+           WHERE user_id = $1 AND vocab_id = $2 AND mastered_at IS NULL`,
+          [userId, vocabId]
+        );
+      }
     }
 
     res.json({
@@ -40,7 +55,7 @@ exports.getCollection = async (req, res) => {
     const userId = req.user.userId;
 
     const result = await pool.query(`
-      SELECT v.*
+      SELECT v.*, uv.mastered_at
       FROM user_collections uv
       JOIN vocab v ON uv.vocab_id = v.id
       WHERE uv.user_id = $1
