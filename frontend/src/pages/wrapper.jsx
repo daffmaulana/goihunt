@@ -4,17 +4,25 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useContext } from 'react';
 import { api } from '../api/axios';
 import { gameToast } from '../components/gameToast';
-import { PackageSearch, GamepadDirectional } from 'lucide-react';
+import { PackageSearch, GamepadDirectional, BookCheck } from 'lucide-react';
 import { UserContext } from '../components/userContext';
 
 export default function Wrapper() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, setUser, refreshUser } = useContext(UserContext);
+  const [reviewCount, setReviewCount] = useState(0);
 
   useEffect(() => {
       refreshUser();
     }, [refreshUser]);
+
+  // Ambil jumlah vocab yang perlu direview hari ini
+  useEffect(() => {
+    api.get('/review/count')
+      .then((res) => setReviewCount(res.data.count))
+      .catch(() => {});
+  }, [location.pathname]);
 
   const isActive = (path) => location.pathname.startsWith(path);
   
@@ -81,14 +89,35 @@ export default function Wrapper() {
       <div id='navbar' className="fixed-bottom d-flex justify-content-center mb-5" >
         <div className="justify-content-center d-flex">
           <div className="bg-white rounded-pill shadow-lg d-flex p-1 shadow" style={{ border: '1px solid #ddd', minWidth: '200px' }}>
+            {/* Tab Klasifikasi */}
             <button 
               onClick={() => navigate('/klasifikasi')}
               className={`btn rounded-pill px-4 d-flex align-items-center gap-2 ${
                 isActive('/klasifikasi') ? 'btn-primary shadow' : 'btn-light border-0 text-muted'
               }`}
             >
-              <PackageSearch size={30} fill={isActive('/gamifikasi') ? 'transparent' : 'transparent'} color={isActive('/gamifikasi') ? '#666' : 'white'} />
+              <PackageSearch size={30} color={isActive('/klasifikasi') ? 'white' : '#666'} />
               {isActive('/klasifikasi') && <span className="fw-bold text-white">Cari</span>}
+            </button>
+
+            {/* Tab Review */}
+            <button
+              onClick={() => navigate('/review')}
+              className={`btn rounded-pill px-4 d-flex align-items-center gap-2 position-relative ${
+                isActive('/review') ? 'btn-primary shadow' : 'btn-light border-0 text-muted'
+              }`}
+            >
+              <BookCheck size={30} color={isActive('/review') ? 'white' : '#666'} />
+              {isActive('/review') && <span className="fw-bold text-white">Review</span>}
+              {/* Badge jumlah vocab yang perlu direview */}
+              {!isActive('/review') && reviewCount > 0 && (
+                <span
+                  className="position-absolute badge rounded-pill bg-danger"
+                  style={{ top: '4px', right: '4px', fontSize: '10px', minWidth: '18px', padding: '2px 5px' }}
+                >
+                  {reviewCount > 99 ? '99+' : reviewCount}
+                </span>
+              )}
             </button>
 
             {/* Tab Gamifikasi */}
@@ -98,7 +127,7 @@ export default function Wrapper() {
                 isActive('/gamifikasi') ? 'btn-primary shadow' : 'btn-light border-0 text-muted'
               }`}
             >
-              <GamepadDirectional size={30} fill={isActive('/gamifikasi') ? 'transparent' : 'transparent'} color={isActive('/gamifikasi') ? 'white' : '#666'} />
+              <GamepadDirectional size={30} color={isActive('/gamifikasi') ? 'white' : '#666'} />
               {isActive('/gamifikasi') && <span className="fw-bold text-white">Main</span>}
             </button>
             

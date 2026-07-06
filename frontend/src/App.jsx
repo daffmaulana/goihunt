@@ -11,6 +11,7 @@ import Gamifikasi from './pages/gamifikasi';
 import Wrapper from './pages/wrapper';
 import Leaderboard from './pages/leaderboard';
 import Koleksi from './pages/koleksi';
+import Review from './pages/review';
 import { UserProvider } from './components/userContext';
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
                 <Route path="/profile" element={<AuthGate type="private"><Profile /></AuthGate>} />
                 <Route path="/leaderboard" element={<AuthGate type="private"><Leaderboard /></AuthGate>} />
                 <Route path="/koleksi" element={<AuthGate type="private"><Koleksi /></AuthGate>} />
+                <Route path="/review" element={<AuthGate type="private"><Review /></AuthGate>} />
 
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

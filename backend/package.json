@@ -9,7 +9,10 @@
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "sr:migrate": "node scripts/migrate_sr.js",
+    "sr:rollback": "node scripts/rollback_sr.js",
+    "sr:reset": "node scripts/rollback_sr.js && node scripts/migrate_sr.js"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

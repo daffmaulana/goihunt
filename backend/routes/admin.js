@@ -11,6 +11,7 @@ const {
   updateAchievement,
   getUsers,
   deleteUser,
+  srTimeTravel,
 } = require('../controllers/admin');
 
 router.get('/quiz', getQuiz);
@@ -26,5 +27,8 @@ router.put('/achievements/:id', updateAchievement);
 
 router.get('/users', getUsers);
 router.delete('/users/:id', deleteUser);
+
+// DEV: mundurkan next_review_at untuk testing Spaced Repetition
+router.post('/sr-time-travel', srTimeTravel);
 
 module.exports = router;

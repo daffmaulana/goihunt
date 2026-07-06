@@ -205,3 +205,33 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: pgMessage(err) });
   }
 };
+
+// ── DEV ONLY: Mundurkan next_review_at untuk testing SR ──────────────────────
+// POST /admin/sr-time-travel
+// Body: { userId, days }  → mundurkan next_review_at semua koleksi user sebesar `days` hari
+// Contoh: { userId: 1, days: 1 } → seolah-olah sudah 1 hari berlalu
+exports.srTimeTravel = async (req, res) => {
+  try {
+    const { userId, days } = req.body;
+
+    if (!userId || !days || days < 1) {
+      return res.status(400).json({ message: 'userId dan days (min 1) wajib diisi' });
+    }
+
+    const result = await pool.query(
+      `UPDATE user_collections
+       SET next_review_at = next_review_at - ($1 * INTERVAL '1 day')
+       WHERE user_id = $2
+       RETURNING vocab_id, next_review_at`,
+      [days, userId]
+    );
+
+    res.json({
+      message: `next_review_at dimundurkan ${days} hari untuk ${result.rowCount} vocab milik user ${userId}`,
+      updated: result.rows
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: pgMessage(err) });
+  }
+};
