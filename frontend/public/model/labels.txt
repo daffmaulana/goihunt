@@ -1,0 +1,10 @@
+ac
+buku
+jam
+kacamata
+kursi
+laptop
+meja
+sepatu
+tas
+topi

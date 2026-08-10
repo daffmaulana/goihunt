@@ -1,0 +1,17 @@
+frontend/node_modules/
+frontend/dist/
+
+# Backend  
+backend/node_modules/
+backend/.env
+
+# Environment
+.env
+.env.local
+node_modules/
+backend/scripts/
+# SPESIFIKASI_SISTEM.MD
+# backup.sql
+goihunt_backup.sql
+
+pseudocode.txt
