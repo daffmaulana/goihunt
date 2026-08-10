@@ -39,18 +39,37 @@ Camera → Object Recognition → Japanese Vocabulary → Learn → Earn XP → 
 ```
 
 ---
-
+ 
 ## Demo
-
+ 
 > Point the camera at an everyday object and discover its Japanese vocabulary.
-
-https://github.com/user-attachments/assets/17d152c9-8d99-4e70-b0a2-2c9860a2a3c1
-
-<img width="850" height="1808" alt="Group 176" src="https://github.com/user-attachments/assets/41abb498-6692-4f9c-b544-538ef215ebe1" />
-<img width="850" height="1598" alt="goihunt vercel app_klasifikasi (5)" src="https://github.com/user-attachments/assets/4afd46f8-b788-4fbd-8b17-7c2b2290e764" />
-<img width="850" height="1808" alt="goihunt vercel app_auth (7)" src="https://github.com/user-attachments/assets/e7426265-dce9-4b8f-95a9-5d36945beccc" />
-<img width="850" height="1808" alt="goihunt vercel app_auth (5)" src="https://github.com/user-attachments/assets/794b4510-717c-473c-b62c-8aad0024d517" />
-
+ 
+https://github.com/user-attachments/assets/e33168ea-3e61-4f51-ad99-c684e8d5825f
+ 
+<table>
+  <tr>
+    <td align="center" width="20%">
+      <img src="https://github.com/user-attachments/assets/41abb498-6692-4f9c-b544-538ef215ebe1" width="160" alt="Scan" /><br />
+      <sub><strong>Scan</strong></sub>
+    </td>
+    <td align="center" width="20%">
+      <img src="https://github.com/user-attachments/assets/fdd04126-5604-4c37-bab0-b5171d984063" width="160" alt="Vocab" /><br />
+      <sub><strong>Vocab</strong></sub>
+    </td>
+    <td align="center" width="20%">
+      <img src="https://github.com/user-attachments/assets/8567520a-f7aa-4fa3-9261-07312f105655" width="160" alt="Quiz" /><br />
+      <sub><strong>Quiz</strong></sub>
+    </td>
+    <td align="center" width="20%">
+      <img src="https://github.com/user-attachments/assets/e7426265-dce9-4b8f-95a9-5d36945beccc" width="160" alt="Collection" /><br />
+      <sub><strong>Collection</strong></sub>
+    </td>
+    <td align="center" width="20%">
+      <img src="https://github.com/user-attachments/assets/794b4510-717c-473c-b62c-8aad0024d517" width="160" alt="Gamification" /><br />
+      <sub><strong>Gamification</strong></sub>
+    </td>
+  </tr>
+</table>
 ---
 
 ## Features
