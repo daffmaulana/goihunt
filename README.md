@@ -90,11 +90,11 @@ https://github.com/user-attachments/assets/e33168ea-3e61-4f51-ad99-c684e8d5825f
 
 ## Machine Learning
 
-GoiHunt uses **MobileNetV2** with **transfer learning** for image classification, trained to recognize **11 object classes**:
+GoiHunt uses **MobileNetV2** with **transfer learning** for image classification, trained to recognize **10 object classes**:
 
 ```text
 ac · buku · jam · kacamata · kursi · laptop
-meja · random · sepatu · tas · topi
+meja · sepatu · tas · topi
 ```
 
 ### Model Architecture
@@ -112,7 +112,7 @@ Global Average Pooling
 Dense → Softmax
       │
       ▼
-11 Classes
+10 Classes
 ```
 
 ### Training Configuration
