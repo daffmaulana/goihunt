@@ -44,7 +44,12 @@ Camera → Object Recognition → Japanese Vocabulary → Learn → Earn XP → 
 
 > Point the camera at an everyday object and discover its Japanese vocabulary.
 
-Coming soon
+https://github.com/user-attachments/assets/17d152c9-8d99-4e70-b0a2-2c9860a2a3c1
+
+<img width="850" height="1808" alt="Group 176" src="https://github.com/user-attachments/assets/41abb498-6692-4f9c-b544-538ef215ebe1" />
+<img width="850" height="1598" alt="goihunt vercel app_klasifikasi (5)" src="https://github.com/user-attachments/assets/4afd46f8-b788-4fbd-8b17-7c2b2290e764" />
+<img width="850" height="1808" alt="goihunt vercel app_auth (7)" src="https://github.com/user-attachments/assets/e7426265-dce9-4b8f-95a9-5d36945beccc" />
+<img width="850" height="1808" alt="goihunt vercel app_auth (5)" src="https://github.com/user-attachments/assets/794b4510-717c-473c-b62c-8aad0024d517" />
 
 ---
 
