@@ -15,11 +15,16 @@ const globalLimiter = rateLimit({
   }
 });
 
-app.use(cors({origin: 
-  process.env.FRONTEND_URL,
-  // 'https://192.168.1.9:5173', 
-  // 'https://172.25.20.82:5173', 
-  credentials: true}));
+const allowedOrigins = [
+  process.env.VERCEL_URL,
+  process.env.DOMAIN_URL
+].filter(Boolean);
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(globalLimiter);
